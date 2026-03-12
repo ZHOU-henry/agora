@@ -47,6 +47,14 @@ export default async function RunDetailPage({ params }: RunDetailPageProps) {
           ))}
         </div>
       </section>
+
+      <section className="panel">
+        <h2>Agent Provenance</h2>
+        <p className="tagline">
+          {run.agent.provenanceStatus.replaceAll("_", " ")}
+        </p>
+        <p>{run.agent.provenanceSummary}</p>
+      </section>
     </main>
   );
 }

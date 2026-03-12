@@ -12,6 +12,8 @@ model AgentDefinition {
   name         String
   summary      String
   description  String
+  provenanceStatus String   @default("seeded")
+  provenanceSummary String  @default("Seeded internal agent metadata.")
   tags         String[]
   constraints  String[]
   trustSignals String[]

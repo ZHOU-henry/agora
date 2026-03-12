@@ -45,6 +45,12 @@
 - review notes
 - rerun / escalate decision
 
+### Queue
+
+- operator queue for active work
+- review queue for completed but unreviewed runs
+- recent request visibility
+
 ## Current Implementation Status
 
 - catalog list: implemented
@@ -52,3 +58,5 @@
 - task intake: implemented
 - run detail: implemented
 - operator review: implemented as a first minimal verdict flow
+- operator queue: implemented
+- provenance display: implemented as a first seeded-source visibility layer

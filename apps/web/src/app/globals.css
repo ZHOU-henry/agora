@@ -116,6 +116,20 @@ body {
   font-weight: 700;
 }
 
+.provenance {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #7c2d12;
+}
+
+.provenance {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #7c2d12;
+}
+
 .form {
   display: grid;
   gap: 16px;
@@ -209,4 +223,56 @@ body {
 .stack {
   display: grid;
   gap: 8px;
+}
+
+.stats {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  min-width: 130px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.8);
+  display: grid;
+  gap: 6px;
+}
+
+.stat strong {
+  font-size: 26px;
+}
+
+.stat span,
+.small {
+  color: var(--muted);
+}
+
+.stats {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.stat {
+  min-width: 130px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.8);
+  display: grid;
+  gap: 6px;
+}
+
+.stat strong {
+  font-size: 26px;
+}
+
+.stat span,
+.small {
+  color: var(--muted);
 }

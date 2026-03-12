@@ -38,6 +38,14 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
       </section>
 
       <section className="panel">
+        <h2>Provenance</h2>
+        <p className="tagline">
+          Status: {agent.provenanceStatus.replaceAll("_", " ")}
+        </p>
+        <p>{agent.provenanceSummary}</p>
+      </section>
+
+      <section className="panel">
         <h2>Constraints</h2>
         <ul>
           {agent.constraints.map((constraint) => (

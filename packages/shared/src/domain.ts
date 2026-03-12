@@ -1,6 +1,11 @@
 import { z } from "zod";
 
 export const AgentStatusSchema = z.enum(["draft", "active"]);
+export const ProvenanceStatusSchema = z.enum([
+  "seeded",
+  "reviewed_external",
+  "mixed"
+]);
 
 export const AgentDefinitionSchema = z.object({
   id: z.string(),
@@ -8,6 +13,8 @@ export const AgentDefinitionSchema = z.object({
   name: z.string(),
   summary: z.string(),
   description: z.string(),
+  provenanceStatus: ProvenanceStatusSchema,
+  provenanceSummary: z.string(),
   tags: z.array(z.string()),
   constraints: z.array(z.string()),
   trustSignals: z.array(z.string()),
@@ -126,8 +133,17 @@ export const TaskRunDetailSchema = TaskRunRecordSchema.extend({
 
 export type TaskRunDetail = z.infer<typeof TaskRunDetailSchema>;
 
+export const TaskRunSummarySchema = TaskRunRecordSchema.extend({
+  taskTitle: z.string(),
+  agent: AgentDefinitionSchema,
+  reviewDecision: ReviewDecisionRecordSchema.nullable()
+});
+
+export type TaskRunSummary = z.infer<typeof TaskRunSummarySchema>;
+
 export const AgentDefinitionListSchema = z.array(AgentDefinitionSchema);
 export const TaskRequestDetailListSchema = z.array(TaskRequestDetailSchema);
+export const TaskRunSummaryListSchema = z.array(TaskRunSummarySchema);
 
 export const agentDefinitions: AgentDefinition[] = [
   {
@@ -137,6 +153,9 @@ export const agentDefinitions: AgentDefinition[] = [
     summary: "Project-control intelligence focused on scope, sequencing, and execution clarity.",
     description:
       "Athena helps operators choose direction, structure work, and keep an agent program aligned to real milestones rather than narrative drift.",
+    provenanceStatus: "seeded",
+    provenanceSummary:
+      "Seeded by the Agora team from internal role definitions and execution architecture decisions.",
     tags: ["planning", "strategy", "portfolio"],
     constraints: [
       "Best when the task needs prioritization and decomposition",
@@ -156,6 +175,9 @@ export const agentDefinitions: AgentDefinition[] = [
     summary: "Research and intelligence agent for source-backed market and technical analysis.",
     description:
       "Hermes helps operators validate market, product, and technical claims using reliable sources and explicit uncertainty notes.",
+    provenanceStatus: "seeded",
+    provenanceSummary:
+      "Seeded by the Agora team from the internal research role and source-discipline operating model.",
     tags: ["research", "sources", "analysis"],
     constraints: [
       "Best when source quality matters",
@@ -175,6 +197,9 @@ export const agentDefinitions: AgentDefinition[] = [
     summary: "Engineering agent for implementation, scaffolding, and delivery mechanics.",
     description:
       "Hephaestus turns validated plans into working code, repeatable tooling, and maintainable system structure.",
+    provenanceStatus: "seeded",
+    provenanceSummary:
+      "Seeded by the Agora team from the internal engineering role and implementation workflow model.",
     tags: ["code", "delivery", "systems"],
     constraints: [
       "Best when scope and architecture are clear enough to build",

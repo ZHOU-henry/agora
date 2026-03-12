@@ -11,6 +11,8 @@ type DbAgent = {
   name: string;
   summary: string;
   description: string;
+  provenanceStatus: string;
+  provenanceSummary: string;
   tags: string[];
   constraints: string[];
   trustSignals: string[];
@@ -66,6 +68,8 @@ export function serializeAgentDefinition(agent: DbAgent): AgentDefinition {
     name: agent.name,
     summary: agent.summary,
     description: agent.description,
+    provenanceStatus: agent.provenanceStatus as AgentDefinition["provenanceStatus"],
+    provenanceSummary: agent.provenanceSummary,
     tags: agent.tags,
     constraints: agent.constraints,
     trustSignals: agent.trustSignals,
@@ -129,6 +133,31 @@ export function serializeTaskRunDetail(taskRun: DbTaskRun & {
       message: event.message,
       createdAt: event.createdAt.toISOString()
     })),
+    reviewDecision: taskRun.reviewDecision
+      ? {
+          id: taskRun.reviewDecision.id,
+          taskRunId: taskRun.reviewDecision.taskRunId,
+          verdict:
+            taskRun.reviewDecision.verdict as NonNullable<
+              TaskRunDetail["reviewDecision"]
+            >["verdict"],
+          notes: taskRun.reviewDecision.notes ?? "",
+          reviewedAt: taskRun.reviewDecision.reviewedAt.toISOString(),
+          createdAt: taskRun.reviewDecision.createdAt.toISOString(),
+          updatedAt: taskRun.reviewDecision.updatedAt.toISOString()
+        }
+      : null
+  };
+}
+
+export function serializeTaskRunSummary(taskRun: DbTaskRun & {
+  taskRequest: DbTaskRequest & { agent: DbAgent };
+  reviewDecision: DbReviewDecision | null;
+}) {
+  return {
+    ...serializeTaskRunRecord(taskRun),
+    taskTitle: taskRun.taskRequest.title,
+    agent: serializeAgentDefinition(taskRun.taskRequest.agent),
     reviewDecision: taskRun.reviewDecision
       ? {
           id: taskRun.reviewDecision.id,

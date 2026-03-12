@@ -6,7 +6,8 @@ import type {
 import { prisma } from "../lib/prisma.js";
 import {
   serializeTaskRequestDetail,
-  serializeTaskRunDetail
+  serializeTaskRunDetail,
+  serializeTaskRunSummary
 } from "../lib/serialize.js";
 
 export async function listTaskRequests() {
@@ -96,6 +97,24 @@ export async function getTaskRunById(id: string) {
   });
 
   return row ? serializeTaskRunDetail(row) : null;
+}
+
+export async function listTaskRuns() {
+  const rows = await prisma.taskRun.findMany({
+    include: {
+      taskRequest: {
+        include: {
+          agent: true
+        }
+      },
+      reviewDecision: true
+    },
+    orderBy: {
+      createdAt: "desc"
+    }
+  });
+
+  return rows.map(serializeTaskRunSummary);
 }
 
 export async function updateTaskRunStatus(

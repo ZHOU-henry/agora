@@ -9,6 +9,7 @@ import {
   createTaskRequest,
   getTaskRequestById,
   getTaskRunById,
+  listTaskRuns,
   listTaskRequests,
   submitReviewDecision,
   updateTaskRunStatus
@@ -89,6 +90,12 @@ server.get("/task-runs/:id", async (request, reply) => {
 
   return {
     item: taskRun
+  };
+});
+
+server.get("/task-runs", async () => {
+  return {
+    items: await listTaskRuns()
   };
 });
 

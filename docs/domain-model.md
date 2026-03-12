@@ -110,6 +110,11 @@ Persisted now:
 - `RunEvent`
 - `ReviewDecision`
 
+Represented in the operator UI now:
+
+- queue view for active and review-ready runs
+- provenance metadata on agents and run surfaces
+
 ## Phase-1 Rule
 
 Keep the model centered on:

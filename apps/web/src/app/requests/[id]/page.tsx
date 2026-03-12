@@ -50,6 +50,14 @@ export default async function TaskRequestPage({ params }: TaskRequestPageProps) 
           ))}
         </div>
       </section>
+
+      <section className="panel">
+        <h2>Agent Provenance</h2>
+        <p className="tagline">
+          {taskRequest.agent.provenanceStatus.replaceAll("_", " ")}
+        </p>
+        <p>{taskRequest.agent.provenanceSummary}</p>
+      </section>
     </main>
   );
 }

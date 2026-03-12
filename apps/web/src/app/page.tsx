@@ -1,9 +1,15 @@
 import Link from "next/link";
-import { getAgentCatalog, getTaskRequests } from "../lib/api";
+import { getAgentCatalog, getTaskRequests, getTaskRuns } from "../lib/api";
 
 export default async function HomePage() {
   const agents = await getAgentCatalog();
   const requests = await getTaskRequests();
+  const runs = await getTaskRuns();
+  const reviewQueue = runs.filter(
+    (run) =>
+      (run.status === "completed" || run.status === "failed") &&
+      run.reviewDecision === null
+  );
 
   return (
     <main className="page">
@@ -33,6 +39,9 @@ export default async function HomePage() {
             <article key={agent.id} className="card">
               <h3>{agent.name}</h3>
               <p>{agent.summary}</p>
+              <p className="provenance">
+                Provenance: {agent.provenanceStatus.replaceAll("_", " ")}
+              </p>
               <p className="tagline">{agent.tags.join(" · ")}</p>
               <Link href={`/agents/${agent.slug}`} className="cardlink">
                 Inspect and submit task
@@ -60,6 +69,30 @@ export default async function HomePage() {
               </article>
             ))
           )}
+        </div>
+      </section>
+
+      <section className="panel">
+        <h2>Operator Queue</h2>
+        <p className="lede small">
+          Track active runs, recent requests, and review-ready work from one operator view.
+        </p>
+        <Link href="/queue" className="cardlink">
+          Open queue
+        </Link>
+        <div className="stats">
+          <div className="stat">
+            <strong>{requests.length}</strong>
+            <span>task requests</span>
+          </div>
+          <div className="stat">
+            <strong>{runs.length}</strong>
+            <span>runs</span>
+          </div>
+          <div className="stat">
+            <strong>{reviewQueue.length}</strong>
+            <span>awaiting review</span>
+          </div>
         </div>
       </section>
     </main>

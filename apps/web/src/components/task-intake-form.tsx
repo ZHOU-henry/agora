@@ -7,6 +7,7 @@ import {
   type TaskRequestDetail
 } from "@agora/shared/domain";
 import { apiBaseUrl } from "../lib/api";
+import { isReadOnlyPreviewMode } from "../lib/runtime";
 
 type TaskIntakeFormProps = {
   agentId: string;
@@ -14,6 +15,7 @@ type TaskIntakeFormProps = {
 };
 
 export function TaskIntakeForm({ agentId, agentName }: TaskIntakeFormProps) {
+  const readOnlyPreview = isReadOnlyPreviewMode();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [contextNote, setContextNote] = useState("");
@@ -23,6 +25,12 @@ export function TaskIntakeForm({ agentId, agentName }: TaskIntakeFormProps) {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (readOnlyPreview) {
+      setError("Preview mode is read-only.");
+      return;
+    }
+
     setError("");
     setSubmitted(null);
 
@@ -78,6 +86,11 @@ export function TaskIntakeForm({ agentId, agentName }: TaskIntakeFormProps) {
   return (
     <section className="panel">
       <h2>Submit A Task To {agentName}</h2>
+      {readOnlyPreview ? (
+        <p className="small">
+          Preview mode is active. Task submission is intentionally disabled.
+        </p>
+      ) : null}
       <form className="form" onSubmit={handleSubmit}>
         <label>
           <span>Task title</span>
@@ -85,6 +98,7 @@ export function TaskIntakeForm({ agentId, agentName }: TaskIntakeFormProps) {
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="Summarize the top risks in this workflow"
+            disabled={readOnlyPreview}
           />
         </label>
 
@@ -95,6 +109,7 @@ export function TaskIntakeForm({ agentId, agentName }: TaskIntakeFormProps) {
             onChange={(event) => setDescription(event.target.value)}
             rows={6}
             placeholder="Describe the task, goal, and what a good result should look like."
+            disabled={readOnlyPreview}
           />
         </label>
 
@@ -105,11 +120,16 @@ export function TaskIntakeForm({ agentId, agentName }: TaskIntakeFormProps) {
             onChange={(event) => setContextNote(event.target.value)}
             rows={4}
             placeholder="Add any useful project context or constraints."
+            disabled={readOnlyPreview}
           />
         </label>
 
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Submit task"}
+        <button type="submit" disabled={isSubmitting || readOnlyPreview}>
+          {readOnlyPreview
+            ? "Read-only preview"
+            : isSubmitting
+              ? "Submitting..."
+              : "Submit task"}
         </button>
       </form>
 

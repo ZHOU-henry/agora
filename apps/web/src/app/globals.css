@@ -25,6 +25,60 @@ body {
   font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
 }
 
+.siteheader {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(248, 245, 238, 0.88);
+  backdrop-filter: blur(16px);
+}
+
+.sitebrand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brandlink,
+.navlink {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.sitenav {
+  display: flex;
+  gap: 16px;
+}
+
+.modechip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(20, 83, 45, 0.12);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.previewnotice {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(124, 45, 18, 0.12);
+  background: rgba(255, 237, 213, 0.8);
+  color: #7c2d12;
+}
+
 .page {
   min-height: 100vh;
   padding: 56px 20px 80px;
@@ -281,28 +335,32 @@ body {
   font-weight: 700;
 }
 
-.stats {
-  display: flex;
+.resultgrid {
+  display: grid;
   gap: 12px;
-  margin-top: 18px;
-  flex-wrap: wrap;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
-.stat {
-  min-width: 130px;
+.resultcard {
   padding: 14px 16px;
   border-radius: 18px;
   border: 1px solid var(--border);
-  background: rgba(255, 255, 255, 0.8);
-  display: grid;
-  gap: 6px;
+  background: rgba(255, 255, 255, 0.75);
 }
 
-.stat strong {
-  font-size: 26px;
+.chiprow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
-.stat span,
-.small {
-  color: var(--muted);
+.datachip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(20, 83, 45, 0.08);
+  font-size: 12px;
+  font-weight: 700;
 }

@@ -8,6 +8,7 @@ import {
   type TaskRunDetail
 } from "@agora/shared/domain";
 import { apiBaseUrl } from "../lib/api";
+import { isReadOnlyPreviewMode } from "../lib/runtime";
 
 const verdicts: ReviewVerdict[] = ["approved", "needs_work", "rejected"];
 
@@ -16,6 +17,7 @@ type ReviewDecisionFormProps = {
 };
 
 export function ReviewDecisionForm({ initialRun }: ReviewDecisionFormProps) {
+  const readOnlyPreview = isReadOnlyPreviewMode();
   const [run, setRun] = useState(initialRun);
   const [verdict, setVerdict] = useState<ReviewVerdict>("approved");
   const [notes, setNotes] = useState("");
@@ -24,6 +26,12 @@ export function ReviewDecisionForm({ initialRun }: ReviewDecisionFormProps) {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+
+    if (readOnlyPreview) {
+      setError("Preview mode is read-only.");
+      return;
+    }
+
     setError("");
     setIsSubmitting(true);
 
@@ -77,12 +85,18 @@ export function ReviewDecisionForm({ initialRun }: ReviewDecisionFormProps) {
   return (
     <section className="panel">
       <h2>Operator Review</h2>
+      {readOnlyPreview ? (
+        <p className="small">
+          Preview mode is active. Review submission is disabled.
+        </p>
+      ) : null}
       <form className="form" onSubmit={handleSubmit}>
         <label>
           <span>Verdict</span>
           <select
             value={verdict}
             onChange={(event) => setVerdict(event.target.value as ReviewVerdict)}
+            disabled={readOnlyPreview}
           >
             {verdicts.map((value) => (
               <option key={value} value={value}>
@@ -99,11 +113,16 @@ export function ReviewDecisionForm({ initialRun }: ReviewDecisionFormProps) {
             onChange={(event) => setNotes(event.target.value)}
             rows={4}
             placeholder="Capture the operator judgment for this run."
+            disabled={readOnlyPreview}
           />
         </label>
 
-        <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Submitting..." : "Submit review"}
+        <button type="submit" disabled={isSubmitting || readOnlyPreview}>
+          {readOnlyPreview
+            ? "Read-only preview"
+            : isSubmitting
+              ? "Submitting..."
+              : "Submit review"}
         </button>
       </form>
 

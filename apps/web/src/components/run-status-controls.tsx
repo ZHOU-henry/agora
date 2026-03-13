@@ -8,6 +8,7 @@ import {
   type TaskRunStatus
 } from "@agora/shared/domain";
 import { apiBaseUrl } from "../lib/api";
+import { isReadOnlyPreviewMode } from "../lib/runtime";
 
 const statusOptions: TaskRunStatus[] = ["running", "completed", "failed"];
 
@@ -16,6 +17,7 @@ type RunStatusControlsProps = {
 };
 
 export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
+  const readOnlyPreview = isReadOnlyPreviewMode();
   const [run, setRun] = useState(initialRun);
   const [message, setMessage] = useState("");
   const [resultSummary, setResultSummary] = useState("");
@@ -25,6 +27,12 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
 
   async function applyStatus(status: TaskRunStatus) {
     setError("");
+
+    if (readOnlyPreview) {
+      setError("Preview mode is read-only.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     let parsedPayload: Record<string, unknown> | null = null;
@@ -93,6 +101,11 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
   return (
     <section className="panel">
       <h2>Run Controls</h2>
+      {readOnlyPreview ? (
+        <p className="small">
+          Preview mode is active. Run state changes are disabled.
+        </p>
+      ) : null}
       <p className="tagline">Current status: {run.status}</p>
       <label className="stack">
         <span>Status message</span>
@@ -100,6 +113,7 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
           value={message}
           onChange={(event) => setMessage(event.target.value)}
           placeholder="Add an execution note"
+          disabled={readOnlyPreview}
         />
       </label>
       <label className="stack">
@@ -109,6 +123,7 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
           onChange={(event) => setResultSummary(event.target.value)}
           rows={3}
           placeholder="Capture the operator-facing outcome of this run."
+          disabled={readOnlyPreview}
         />
       </label>
       <label className="stack">
@@ -118,6 +133,7 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
           onChange={(event) => setResultPayloadText(event.target.value)}
           rows={6}
           placeholder='{"summary":"Task completed","confidence":"medium"}'
+          disabled={readOnlyPreview}
         />
       </label>
       <div className="buttonrow">
@@ -125,7 +141,7 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
           <button
             key={status}
             type="button"
-            disabled={isSubmitting}
+            disabled={isSubmitting || readOnlyPreview}
             onClick={() => applyStatus(status)}
           >
             Mark {status}

@@ -49,6 +49,20 @@ pnpm lint
 pnpm typecheck
 ```
 
+## Read-Only Preview Mode
+
+For a safer demo-only preview, use:
+
+```bash
+AGORA_PREVIEW_MODE=readonly NEXT_PUBLIC_AGORA_PREVIEW_MODE=readonly pnpm dev
+```
+
+In this mode:
+
+- browsing stays enabled
+- write actions are blocked at the API layer
+- the UI shows a read-only preview banner and disables operator write controls
+
 ## Local Database
 
 - local PostgreSQL is the current development system of record

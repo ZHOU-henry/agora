@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ReviewDecisionForm } from "../../../components/review-decision-form";
+import { ResultPayloadView } from "../../../components/result-payload-view";
 import { RunStatusControls } from "../../../components/run-status-controls";
 import { getTaskRun } from "../../../lib/api";
 
@@ -38,13 +39,7 @@ export default async function RunDetailPage({ params }: RunDetailPageProps) {
       <section className="panel">
         <h2>Execution Result</h2>
         <p>{run.resultSummary || "No result summary recorded yet."}</p>
-        {run.resultPayload ? (
-          <pre className="codeblock">
-            {JSON.stringify(run.resultPayload, null, 2)}
-          </pre>
-        ) : (
-          <p className="small">No structured result payload recorded yet.</p>
-        )}
+        <ResultPayloadView payload={run.resultPayload} />
       </section>
 
       <section className="panel">

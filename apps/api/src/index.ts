@@ -15,6 +15,7 @@ import {
   updateTaskRunStatus
 } from "./data/task-requests.js";
 import { prisma } from "./lib/prisma.js";
+import { isReadOnlyPreviewMode } from "./lib/runtime-mode.js";
 import { badRequest, conflict, notFound } from "./lib/respond.js";
 
 const server = Fastify({
@@ -24,7 +25,14 @@ const server = Fastify({
 server.get("/health", async () => {
   return {
     status: "ok",
-    service: "agora-api"
+    service: "agora-api",
+    previewReadOnly: isReadOnlyPreviewMode()
+  };
+});
+
+server.get("/runtime", async () => {
+  return {
+    previewReadOnly: isReadOnlyPreviewMode()
   };
 });
 
@@ -67,6 +75,10 @@ server.get("/task-requests/:id", async (request, reply) => {
 });
 
 server.post("/task-requests", async (request, reply) => {
+  if (isReadOnlyPreviewMode()) {
+    return conflict(reply, "Preview mode is read-only");
+  }
+
   const parsed = TaskRequestInputSchema.safeParse(request.body);
 
   if (!parsed.success) {
@@ -100,6 +112,10 @@ server.get("/task-runs", async (request) => {
 });
 
 server.patch("/task-runs/:id/status", async (request, reply) => {
+  if (isReadOnlyPreviewMode()) {
+    return conflict(reply, "Preview mode is read-only");
+  }
+
   const { id } = request.params as { id: string };
   const parsed = RunStatusUpdateInputSchema.safeParse(request.body);
 
@@ -123,6 +139,10 @@ server.patch("/task-runs/:id/status", async (request, reply) => {
 });
 
 server.post("/task-runs/:id/review", async (request, reply) => {
+  if (isReadOnlyPreviewMode()) {
+    return conflict(reply, "Preview mode is read-only");
+  }
+
   const { id } = request.params as { id: string };
   const parsed = ReviewDecisionInputSchema.safeParse(request.body);
 

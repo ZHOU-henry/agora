@@ -7,7 +7,7 @@ import {
   type ReviewVerdict,
   type TaskRunDetail
 } from "@agora/shared/domain";
-import { apiBaseUrl } from "../lib/api";
+import { browserApiBasePath } from "../lib/api";
 import { isReadOnlyPreviewMode } from "../lib/runtime";
 
 const verdicts: ReviewVerdict[] = ["approved", "needs_work", "rejected"];
@@ -47,7 +47,7 @@ export function ReviewDecisionForm({ initialRun }: ReviewDecisionFormProps) {
     }
 
     try {
-      const response = await fetch(`${apiBaseUrl}/task-runs/${run.id}/review`, {
+      const response = await fetch(`${browserApiBasePath}/task-runs/${run.id}/review`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

@@ -6,7 +6,7 @@ import {
   TaskRequestDetailSchema,
   type TaskRequestDetail
 } from "@agora/shared/domain";
-import { apiBaseUrl } from "../lib/api";
+import { browserApiBasePath } from "../lib/api";
 import { isReadOnlyPreviewMode } from "../lib/runtime";
 
 type TaskIntakeFormProps = {
@@ -49,7 +49,7 @@ export function TaskIntakeForm({ agentId, agentName }: TaskIntakeFormProps) {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${apiBaseUrl}/task-requests`, {
+      const response = await fetch(`${browserApiBasePath}/task-requests`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

@@ -9,10 +9,9 @@ import {
   TaskRunSummaryListSchema,
   findAgentBySlug
 } from "@agora/shared/domain";
+import { browserApiBasePath } from "./api-config";
 
-const apiBaseUrl =
-  process.env.NEXT_PUBLIC_AGORA_API_BASE_URL?.replace(/\/$/, "") ??
-  "http://localhost:3001";
+const apiBaseUrl = process.env.AGORA_INTERNAL_API_BASE_URL?.replace(/\/$/, "") ?? "http://127.0.0.1:3001";
 
 async function tryFetchJson(path: string) {
   try {
@@ -119,3 +118,4 @@ export async function getTaskRuns(rawQuery: unknown = {}) {
 }
 
 export { apiBaseUrl };
+export { browserApiBasePath };

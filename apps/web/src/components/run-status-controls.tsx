@@ -7,7 +7,7 @@ import {
   type TaskRunDetail,
   type TaskRunStatus
 } from "@agora/shared/domain";
-import { apiBaseUrl } from "../lib/api";
+import { browserApiBasePath } from "../lib/api";
 import { isReadOnlyPreviewMode } from "../lib/runtime";
 
 const statusOptions: TaskRunStatus[] = ["running", "completed", "failed"];
@@ -62,7 +62,7 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
     }
 
     try {
-      const response = await fetch(`${apiBaseUrl}/task-runs/${run.id}/status`, {
+      const response = await fetch(`${browserApiBasePath}/task-runs/${run.id}/status`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json"

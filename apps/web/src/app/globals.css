@@ -38,6 +38,58 @@ body {
   position: relative;
 }
 
+.route-loading-shell {
+  isolation: isolate;
+}
+
+.route-loading-frame {
+  min-height: 100vh;
+}
+
+.route-loading-page {
+  padding-top: 18px;
+}
+
+.route-loading-header {
+  background: rgba(4, 8, 20, 0.72);
+}
+
+.route-loading-block {
+  animation: route-loading-pulse 1.1s ease-in-out infinite alternate;
+}
+
+.route-loading-line {
+  height: 12px;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    rgba(108, 232, 255, 0.12),
+    rgba(143, 125, 255, 0.16),
+    rgba(137, 255, 168, 0.12)
+  );
+}
+
+.route-loading-line-short {
+  width: 24%;
+}
+
+.route-loading-line-title {
+  width: 68%;
+  height: 48px;
+}
+
+.route-loading-line-wide {
+  width: 84%;
+  height: 16px;
+}
+
+.route-loading-chiprow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 a {
   color: inherit;
 }
@@ -1238,5 +1290,16 @@ a {
   }
   to {
     transform: translateY(125%);
+  }
+}
+
+@keyframes route-loading-pulse {
+  from {
+    opacity: 0.74;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-2px);
   }
 }

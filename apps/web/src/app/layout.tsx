@@ -53,8 +53,12 @@ export default async function RootLayout({
       : copy.previewNotice.body;
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body>
+    <html
+      lang={locale}
+      suppressHydrationWarning
+      style={{ backgroundColor: "#040814", color: "#ecf6ff" }}
+    >
+      <body style={{ backgroundColor: "#040814", color: "#ecf6ff" }}>
         <div className="appshell">
           <div className="ambient ambient-orbit ambient-orbit-a" aria-hidden="true" />
           <div className="ambient ambient-orbit ambient-orbit-b" aria-hidden="true" />

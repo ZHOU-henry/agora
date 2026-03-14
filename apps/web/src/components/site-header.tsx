@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import { LocaleSwitcher } from "./locale-switcher";
 import type { AccessRole } from "../lib/access-role";
 import type { Locale } from "../lib/locale";
@@ -45,6 +45,17 @@ export function SiteHeader({
   const logoutLabel = locale === "zh" ? "退出" : "Logout";
   const [isSwitchingRole, setIsSwitchingRole] = useState(false);
 
+  useEffect(() => {
+    navItems.forEach((item) => {
+      router.prefetch(item.href);
+    });
+
+    router.prefetch("/");
+    router.prefetch("/customer");
+    router.prefetch("/builders");
+    router.prefetch("/ops");
+  }, [navItems, router]);
+
   async function logout() {
     await fetch("/api/access", {
       method: "DELETE"
@@ -78,8 +89,9 @@ export function SiteHeader({
         throw new Error(payload.error ?? "Role switch failed");
       }
 
-      router.push(payload.redirectTo ?? "/");
-      router.refresh();
+      startTransition(() => {
+        router.push(payload.redirectTo ?? "/");
+      });
     } finally {
       setIsSwitchingRole(false);
     }
@@ -105,6 +117,7 @@ export function SiteHeader({
             <Link
               key={item.href}
               href={item.href}
+              prefetch
               className={`navlink ${isActive ? "navlink-active" : ""}`}
             >
               {item.label}

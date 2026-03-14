@@ -1,5 +1,6 @@
 "use client";
 
+import { startTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Locale } from "../lib/locale";
@@ -34,7 +35,9 @@ export function LocaleSwitcher({
         body: JSON.stringify({ locale: nextLocale })
       });
 
-      router.refresh();
+      startTransition(() => {
+        router.refresh();
+      });
     } finally {
       setIsPending(false);
     }

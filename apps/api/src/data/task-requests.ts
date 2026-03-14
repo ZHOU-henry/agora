@@ -12,6 +12,7 @@ import {
   serializeTaskRunDetail,
   serializeTaskRunSummary
 } from "../lib/serialize.js";
+import { getAgentById } from "./agents.js";
 
 function normalizeResultPayload(
   payload: RunStatusUpdateInput["resultPayload"] | DbJsonLike
@@ -70,6 +71,15 @@ export async function getTaskRequestById(id: string) {
 }
 
 export async function createTaskRequest(input: TaskRequestInput) {
+  const agent = await getAgentById(input.agentId);
+
+  if (!agent) {
+    return {
+      error: "AGENT_NOT_FOUND" as const,
+      agentId: input.agentId
+    };
+  }
+
   const row = await prisma.taskRequest.create({
     data: {
       agentId: input.agentId,

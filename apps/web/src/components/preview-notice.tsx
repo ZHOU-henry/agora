@@ -11,7 +11,8 @@ export function PreviewNotice({ readOnlyPreview }: PreviewNoticeProps) {
     <section className="previewnotice">
       <strong>Read-only preview mode</strong>
       <span>
-        Browsing is enabled, but task submission, status changes, and reviews are blocked.
+        Browsing stays enabled, but task submission, run state changes, and review
+        actions are blocked by both the UI and API.
       </span>
     </section>
   );

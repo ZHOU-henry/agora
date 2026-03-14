@@ -21,7 +21,8 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.json({ ok: true });
   response.cookies.set(COOKIE_NAME, "granted", {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "strict",
+    secure: request.nextUrl.protocol === "https:",
     path: "/",
     maxAge: 60 * 60 * 8
   });
@@ -33,7 +34,7 @@ export async function DELETE() {
   const response = NextResponse.json({ ok: true });
   response.cookies.set(COOKIE_NAME, "", {
     httpOnly: true,
-    sameSite: "lax",
+    sameSite: "strict",
     path: "/",
     maxAge: 0
   });

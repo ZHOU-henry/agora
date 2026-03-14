@@ -19,9 +19,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <SiteHeader readOnlyPreview={readOnlyPreview} />
-        <PreviewNotice readOnlyPreview={readOnlyPreview} />
-        {children}
+        <div className="appshell">
+          <div className="ambient ambient-orbit ambient-orbit-a" aria-hidden="true" />
+          <div className="ambient ambient-orbit ambient-orbit-b" aria-hidden="true" />
+          <div className="ambient ambient-orbit ambient-orbit-c" aria-hidden="true" />
+          <div className="ambient ambient-grid" aria-hidden="true" />
+          <div className="ambient ambient-scan" aria-hidden="true" />
+          <div className="appframe">
+            <SiteHeader readOnlyPreview={readOnlyPreview} />
+            <PreviewNotice readOnlyPreview={readOnlyPreview} />
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );

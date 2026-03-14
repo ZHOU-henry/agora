@@ -1,3 +1,5 @@
+import { humanizeToken } from "../lib/presenters";
+
 type ResultPayloadViewProps = {
   payload: Record<string, unknown> | null | undefined;
 };
@@ -35,7 +37,7 @@ export function ResultPayloadView({ payload }: ResultPayloadViewProps) {
     <div className="resultgrid">
       {Object.entries(payload).map(([key, value]) => (
         <article key={key} className="resultcard">
-          <p className="tagline">{key}</p>
+          <p className="tagline">{humanizeToken(key)}</p>
           {renderValue(value)}
         </article>
       ))}

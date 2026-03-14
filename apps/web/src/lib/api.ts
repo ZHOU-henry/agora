@@ -102,6 +102,7 @@ export async function getTaskRuns(rawQuery: unknown = {}) {
   if (query.agentSlug) params.set("agentSlug", query.agentSlug);
   if (query.status) params.set("status", query.status);
   if (query.reviewState) params.set("reviewState", query.reviewState);
+  if (query.sort) params.set("sort", query.sort);
 
   const suffix = params.size > 0 ? `?${params.toString()}` : "";
 

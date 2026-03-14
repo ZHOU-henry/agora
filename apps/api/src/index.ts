@@ -4,7 +4,11 @@ import {
   RunStatusUpdateInputSchema,
   TaskRequestInputSchema
 } from "@agora/shared/domain";
-import { getAgentBySlug, listAgents, syncAgentDefinitions } from "./data/agents.js";
+import {
+  getAgentBySlug,
+  listAgents,
+  syncAgentDefinitions
+} from "./data/agents.js";
 import {
   createTaskRequest,
   getTaskRequestById,
@@ -86,6 +90,10 @@ server.post("/task-requests", async (request, reply) => {
   }
 
   const record = await createTaskRequest(parsed.data);
+
+  if ("error" in record) {
+    return badRequest(reply, "Selected agent is not available", record);
+  }
 
   return reply.code(201).send({
     item: record

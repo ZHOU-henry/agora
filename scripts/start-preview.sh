@@ -1,10 +1,12 @@
-#!/bin/zsh
+#!/usr/bin/env bash
 set -euo pipefail
 
+SCRIPT_DIR="$(cd -- "$(dirname "$0")" && pwd)"
+ROOT_DIR="$(cd -- "$SCRIPT_DIR/.." && pwd)"
 MODE="${1:-readonly}"
 PASSWORD="${2:-}"
-PID_FILE=".agora-preview.pid"
-LOG_FILE="/tmp/agora-preview.log"
+PID_FILE="$ROOT_DIR/.agora-preview.pid"
+LOG_FILE="${TMPDIR:-/tmp}/agora-preview.log"
 
 if [[ "$MODE" != "readonly" && "$MODE" != "interactive" ]]; then
   echo "Usage: ./scripts/start-preview.sh [readonly|interactive] [password]"
@@ -25,8 +27,6 @@ if [[ -f "$PID_FILE" ]]; then
   rm -f "$PID_FILE"
 fi
 
-pkill -f '/Users/henry/projects/agora' >/dev/null 2>&1 || true
-
 if [[ "$MODE" == "readonly" ]]; then
   export AGORA_PREVIEW_MODE=readonly
   export NEXT_PUBLIC_AGORA_PREVIEW_MODE=readonly
@@ -37,12 +37,18 @@ else
   unset AGORA_ACCESS_PASSWORD || true
 fi
 
-nohup pnpm dev > "$LOG_FILE" 2>&1 &
-echo $! > "$PID_FILE"
+cd "$ROOT_DIR"
+if command -v setsid >/dev/null 2>&1; then
+  nohup setsid pnpm dev > "$LOG_FILE" 2>&1 < /dev/null &
+else
+  nohup pnpm dev > "$LOG_FILE" 2>&1 < /dev/null &
+fi
+PREVIEW_PID=$!
+echo "$PREVIEW_PID" > "$PID_FILE"
 
 echo "Agora preview started."
 echo "Mode: $MODE"
-echo "PID: $(cat "$PID_FILE")"
+echo "PID: $PREVIEW_PID"
 echo "Log: $LOG_FILE"
 echo "Web: http://localhost:3000"
 echo "Queue: http://localhost:3000/queue"

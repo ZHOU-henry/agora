@@ -222,6 +222,28 @@ export const agentDefinitions: AgentDefinition[] = [
       "Explicit implementation boundaries"
     ],
     status: "active"
+  },
+  {
+    id: "themis",
+    slug: "themis",
+    name: "Themis",
+    summary: "Audit and quality intelligence for review gates, release judgment, and execution risk control.",
+    description:
+      "Themis helps operators inspect completed work, challenge weak evidence, and keep launches honest before risky work is accepted or reused.",
+    provenanceStatus: "seeded",
+    provenanceSummary:
+      "Seeded by the Agora team from the internal audit role, provenance gate, and review workflow model.",
+    tags: ["audit", "review", "governance"],
+    constraints: [
+      "Best when the task needs challenge, verification, or release judgment",
+      "Not the right first surface for greenfield strategy or raw implementation"
+    ],
+    trustSignals: [
+      "Explicit review gate",
+      "Constructive adversarial posture",
+      "High emphasis on quality, risk, and provenance"
+    ],
+    status: "active"
   }
 ];
 

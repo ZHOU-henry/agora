@@ -40,7 +40,10 @@ export function AccessGate() {
 
   return (
     <section className="panel">
-      <h2>Preview Access</h2>
+      <div className="sectionhead">
+        <p className="eyebrow">Authentication</p>
+        <h2>Preview access</h2>
+      </div>
       <form className="form" onSubmit={handleSubmit}>
         <label>
           <span>Password</span>
@@ -49,6 +52,7 @@ export function AccessGate() {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             placeholder="Enter preview password"
+            autoFocus
           />
         </label>
         <button type="submit" disabled={isSubmitting}>

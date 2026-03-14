@@ -11,10 +11,15 @@
     "db:push": "pnpm --filter @agora/api prisma:push",
     "db:seed": "pnpm --filter @agora/api db:seed",
     "db:reset": "pnpm --filter @agora/api db:reset",
+    "db:export": "./scripts/export-db.sh",
+    "db:import": "./scripts/import-db.sh",
     "preview:start": "./scripts/start-preview.sh interactive",
     "preview:start:readonly": "./scripts/start-preview.sh readonly CHANGE_ME",
+    "preview:start:public": "./scripts/start-public-preview.sh",
     "preview:stop": "./scripts/stop-preview.sh",
-    "preview:check": "./scripts/check-preview.sh"
+    "preview:stop:public": "./scripts/stop-public-preview.sh",
+    "preview:check": "./scripts/check-preview.sh",
+    "preview:check:public": "./scripts/check-public-preview.sh"
   },
   "devDependencies": {
     "prettier": "^3.6.2",

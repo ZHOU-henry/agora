@@ -7,14 +7,20 @@ import {
   type TaskRequestDetail
 } from "@agora/shared/domain";
 import { browserApiBasePath } from "../lib/api";
+import { formatTimestamp } from "../lib/presenters";
 import { isReadOnlyPreviewMode } from "../lib/runtime";
 
 type TaskIntakeFormProps = {
   agentId: string;
   agentName: string;
+  exampleTasks?: string[];
 };
 
-export function TaskIntakeForm({ agentId, agentName }: TaskIntakeFormProps) {
+export function TaskIntakeForm({
+  agentId,
+  agentName,
+  exampleTasks = []
+}: TaskIntakeFormProps) {
   const readOnlyPreview = isReadOnlyPreviewMode();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -85,11 +91,39 @@ export function TaskIntakeForm({ agentId, agentName }: TaskIntakeFormProps) {
 
   return (
     <section className="panel">
-      <h2>Submit A Task To {agentName}</h2>
+      <div className="sectionhead">
+        <p className="eyebrow">Intake</p>
+        <h2>Submit a task to {agentName}</h2>
+        <p className="lede small">
+          Capture the operator goal, desired outcome, and any edge constraints before
+          routing work.
+        </p>
+      </div>
       {readOnlyPreview ? (
         <p className="small">
           Preview mode is active. Task submission is intentionally disabled.
         </p>
+      ) : null}
+      {exampleTasks.length > 0 ? (
+        <div className="microstack">
+          <p className="microeyebrow">Launch from a seeded prompt</p>
+          <div className="chiprow">
+            {exampleTasks.map((task) => (
+              <button
+                key={task}
+                type="button"
+                className="chipbutton"
+                onClick={() => {
+                  setTitle(task);
+                  setDescription(task);
+                }}
+                disabled={readOnlyPreview}
+              >
+                {task}
+              </button>
+            ))}
+          </div>
+        </div>
       ) : null}
       <form className="form" onSubmit={handleSubmit}>
         <label>
@@ -139,7 +173,8 @@ export function TaskIntakeForm({ agentId, agentName }: TaskIntakeFormProps) {
         <div className="receipt">
           <h3>Task submitted</h3>
           <p>
-            Request <code>{submitted.id}</code> is now <strong>{submitted.status}</strong>.
+            Request <span className="inlinecode">{submitted.id}</span> is now{" "}
+            <strong>{submitted.status}</strong>.
           </p>
           {submitted.runs[0] ? (
             <p>
@@ -148,7 +183,7 @@ export function TaskIntakeForm({ agentId, agentName }: TaskIntakeFormProps) {
               </a>
             </p>
           ) : null}
-          <p className="tagline">Created at {submitted.createdAt}</p>
+          <p className="tagline">Created at {formatTimestamp(submitted.createdAt)}</p>
         </div>
       ) : null}
     </section>

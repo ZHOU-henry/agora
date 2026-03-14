@@ -3,10 +3,17 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
+      "env": ["NEXT_PUBLIC_AGORA_PREVIEW_MODE"],
+      "passThroughEnv": ["AGORA_PREVIEW_MODE", "AGORA_ACCESS_PASSWORD"],
       "outputs": [".next/**", "dist/**"]
     },
     "dev": {
       "cache": false,
+      "passThroughEnv": [
+        "AGORA_PREVIEW_MODE",
+        "NEXT_PUBLIC_AGORA_PREVIEW_MODE",
+        "AGORA_ACCESS_PASSWORD"
+      ],
       "persistent": true
     },
     "lint": {

@@ -19,6 +19,13 @@ The safest first remote demo pattern is:
 - read-only preview mode
 - only after that, expose the site through a controlled tunnel or private network route
 
+Current helper flow:
+
+```bash
+./scripts/start-public-preview.sh [PASSWORD]
+./scripts/check-public-preview.sh
+```
+
 ## What Not To Do
 
 - do not expose the interactive mode publicly

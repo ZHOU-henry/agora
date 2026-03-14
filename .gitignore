@@ -13,4 +13,5 @@ __pycache__/
 venv/
 *.log
 *.tsbuildinfo
+.agora-preview.pid
 apps/api/prisma/dev.db

@@ -27,6 +27,7 @@ Stage 1: executable monorepo with persisted task requests, first run record life
 
 ## Current Product Slice
 
+- seeded four-agent catalog aligned to Athena, Hermes, Hephaestus, and Themis
 - agent catalog
 - agent detail
 - task intake
@@ -47,6 +48,8 @@ pnpm --filter @agora/api prisma:push
 pnpm dev
 pnpm lint
 pnpm typecheck
+pnpm db:export
+pnpm db:import /path/to/dump.sql
 ```
 
 ## Read-Only Preview Mode
@@ -68,6 +71,9 @@ In this mode:
 ```bash
 ./scripts/start-preview.sh interactive
 ./scripts/start-preview.sh readonly YOUR_PASSWORD
+./scripts/start-public-preview.sh [PASSWORD]
+./scripts/check-public-preview.sh
+./scripts/stop-public-preview.sh
 ./scripts/check-preview.sh
 ./scripts/stop-preview.sh
 ```

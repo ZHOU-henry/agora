@@ -8,6 +8,7 @@ import {
   type TaskRunDetail
 } from "@agora/shared/domain";
 import { browserApiBasePath } from "../lib/api";
+import { formatTimestamp, titleizeToken, toneClass } from "../lib/presenters";
 import { isReadOnlyPreviewMode } from "../lib/runtime";
 
 const verdicts: ReviewVerdict[] = ["approved", "needs_work", "rejected"];
@@ -84,7 +85,10 @@ export function ReviewDecisionForm({ initialRun }: ReviewDecisionFormProps) {
 
   return (
     <section className="panel">
-      <h2>Operator Review</h2>
+      <div className="sectionhead">
+        <p className="eyebrow">Review</p>
+        <h2>Operator review</h2>
+      </div>
       {readOnlyPreview ? (
         <p className="small">
           Preview mode is active. Review submission is disabled.
@@ -130,9 +134,15 @@ export function ReviewDecisionForm({ initialRun }: ReviewDecisionFormProps) {
         <div className="receipt">
           <h3>Latest review</h3>
           <p>
-            Verdict: <strong>{run.reviewDecision.verdict}</strong>
+            Verdict:{" "}
+            <span className={`statuspill ${toneClass(run.reviewDecision.verdict)}`}>
+              {titleizeToken(run.reviewDecision.verdict)}
+            </span>
           </p>
-          <p>{run.reviewDecision.notes}</p>
+          <p>{run.reviewDecision.notes || "No review notes captured."}</p>
+          <p className="tagline">
+            Reviewed at {formatTimestamp(run.reviewDecision.reviewedAt)}
+          </p>
         </div>
       ) : null}
 

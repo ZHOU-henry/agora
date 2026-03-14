@@ -8,6 +8,7 @@ import {
   type TaskRunStatus
 } from "@agora/shared/domain";
 import { browserApiBasePath } from "../lib/api";
+import { titleizeToken, toneClass } from "../lib/presenters";
 import { isReadOnlyPreviewMode } from "../lib/runtime";
 
 const statusOptions: TaskRunStatus[] = ["running", "completed", "failed"];
@@ -100,13 +101,21 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
 
   return (
     <section className="panel">
-      <h2>Run Controls</h2>
+      <div className="sectionhead">
+        <p className="eyebrow">Control</p>
+        <h2>Run controls</h2>
+      </div>
       {readOnlyPreview ? (
         <p className="small">
           Preview mode is active. Run state changes are disabled.
         </p>
       ) : null}
-      <p className="tagline">Current status: {run.status}</p>
+      <p className="tagline">
+        Current status:{" "}
+        <span className={`statuspill ${toneClass(run.status)}`}>
+          {titleizeToken(run.status)}
+        </span>
+      </p>
       <label className="stack">
         <span>Status message</span>
         <input
@@ -144,7 +153,7 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
             disabled={isSubmitting || readOnlyPreview}
             onClick={() => applyStatus(status)}
           >
-            Mark {status}
+            Mark {titleizeToken(status)}
           </button>
         ))}
       </div>

@@ -20,6 +20,14 @@ export async function getAgentBySlug(slug: string) {
   return row ? serializeAgentDefinition(row) : null;
 }
 
+export async function getAgentById(id: string) {
+  const row = await prisma.agentDefinition.findUnique({
+    where: { id }
+  });
+
+  return row ? serializeAgentDefinition(row) : null;
+}
+
 export async function syncAgentDefinitions() {
   for (const agent of agentDefinitions) {
     await prisma.agentDefinition.upsert({

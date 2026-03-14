@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MediaCard } from "../../../components/media-card";
 import { ReviewDecisionForm } from "../../../components/review-decision-form";
 import { ResultPayloadView } from "../../../components/result-payload-view";
 import { RunStatusControls } from "../../../components/run-status-controls";
@@ -72,6 +73,30 @@ export default async function RunDetailPage({ params }: RunDetailPageProps) {
             </article>
           </div>
         </aside>
+      </section>
+
+      <section className="panel">
+        <div className="sectionhead">
+          <p className="eyebrow">Run Visualization</p>
+          <h2>Make execution records feel like real operating footage</h2>
+        </div>
+        <div className="media-stage media-stage-balanced">
+          <MediaCard
+            src="/media/execution-reel-loop.svg"
+            alt="Animated execution reel showing intake, build, run, and review."
+            kicker="Run reel"
+            title="The execution record is a visible conveyor, not a hidden log"
+            caption="This visual layer helps buyers and builders imagine live throughput, not just static database rows."
+          />
+          <MediaCard
+            src="/media/agent-constellation-loop.svg"
+            alt="Animated agent constellation showing specialist lanes around a shared core."
+            kicker="Specialist lane"
+            title="Each run belongs to a specialist system"
+            caption="A stronger visual identity makes execution traces more legible and memorable."
+            compact
+          />
+        </div>
       </section>
 
       <div className="surface-grid surface-grid-two">

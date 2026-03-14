@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MediaCard } from "../../../components/media-card";
 import { getProviderDetail } from "../../../lib/api";
 import { humanizeToken, toneClass } from "../../../lib/presenters";
 
@@ -72,6 +73,30 @@ export default async function ProviderDetailPage({
 
       <section className="panel">
         <div className="sectionhead">
+          <p className="eyebrow">Builder Reel</p>
+          <h2>Show how a supplier fits into the platform</h2>
+        </div>
+        <div className="media-stage media-stage-balanced">
+          <MediaCard
+            src="/media/builder-network-loop.svg"
+            alt="Animated builder network showing outside agent developers feeding the catalog."
+            kicker="Builder network"
+            title="Supply-side imagination space"
+            caption="Even before full third-party onboarding exists in product mechanics, the experience should suggest a future with many builders."
+          />
+          <MediaCard
+            src="/media/execution-reel-loop.svg"
+            alt="Animated execution reel showing how platform demand becomes delivery and review."
+            kicker="Delivery path"
+            title="Demand reaches builders through an inspectable flow"
+            caption="This is the commercial promise: demand becomes specialized delivery instead of static catalog browsing."
+            compact
+          />
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="sectionhead">
           <p className="eyebrow">Published Agents</p>
           <h2>Current catalog output</h2>
           <p className="lede small">
@@ -89,6 +114,12 @@ export default async function ProviderDetailPage({
               </div>
               <h3>{agent.name}</h3>
               <p>{agent.summary}</p>
+              <img
+                className="card-inline-media"
+                src="/media/agent-constellation-loop.svg"
+                alt=""
+                aria-hidden="true"
+              />
               <Link href={`/agents/${agent.slug}`} className="cardlink">
                 Inspect agent
               </Link>

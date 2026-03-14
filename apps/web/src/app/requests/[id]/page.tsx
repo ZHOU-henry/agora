@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MediaCard } from "../../../components/media-card";
 import { getTaskRequest } from "../../../lib/api";
 import { formatTimestamp, humanizeToken, titleizeToken, toneClass } from "../../../lib/presenters";
 
@@ -70,6 +71,30 @@ export default async function TaskRequestPage({ params }: TaskRequestPageProps) 
             </article>
           </div>
         </aside>
+      </section>
+
+      <section className="panel">
+        <div className="sectionhead">
+          <p className="eyebrow">Request Visualization</p>
+          <h2>Help the requester imagine what happens next</h2>
+        </div>
+        <div className="media-stage media-stage-balanced">
+          <MediaCard
+            src="/media/control-theater-loop.svg"
+            alt="Animated control theater showing how a request enters the platform and reaches routing and review."
+            kicker="Request path"
+            title="A task request should suggest downstream motion"
+            caption="The page should imply routing, execution, and review even before the user opens a specific run."
+          />
+          <MediaCard
+            src="/media/builder-network-loop.svg"
+            alt="Animated builder network showing supply-side developers around a demand board."
+            kicker="Builder context"
+            title="Demand belongs inside a bigger supply-side market"
+            caption="This request is not just for one agent card; it belongs to a future marketplace of specialized builders."
+            compact
+          />
+        </div>
       </section>
 
       <div className="surface-grid surface-grid-two">

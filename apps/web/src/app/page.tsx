@@ -5,6 +5,7 @@ import {
   getTaskRequests,
   getTaskRuns
 } from "../lib/api";
+import { MediaCard } from "../components/media-card";
 import { getAgentIntelligence } from "../lib/agent-intelligence";
 import { formatTimestamp, humanizeToken, titleizeToken, toneClass } from "../lib/presenters";
 
@@ -164,6 +165,52 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             </article>
           </div>
         </aside>
+      </section>
+
+      <section className="panel">
+        <div className="sectionhead">
+          <p className="eyebrow">Visual Brief</p>
+          <h2>Show the platform before asking people to read it</h2>
+          <p className="lede small">
+            The launch experience should feel like a living agent market, not a stack
+            of paragraphs about one.
+          </p>
+        </div>
+        <div className="media-stage">
+          <MediaCard
+            src="/media/control-theater-loop.svg"
+            alt="Animated control theater showing customer demand, builder supply, routing, and review."
+            kicker="Hero loop"
+            title="A control surface with customer demand and builder supply in one frame"
+            caption="This establishes the whole fantasy fast: incoming need, routing intelligence, outside builders, and visible review."
+          />
+          <div className="media-grid-compact">
+            <MediaCard
+              src="/media/builder-network-loop.svg"
+              alt="Animated builder network showing multiple developers responding to a demand board."
+              kicker="Supply side"
+              title="Multiple builders, not one private stack"
+              caption="The product now signals an open developer-side future instead of a single-provider shell."
+              compact
+            />
+            <MediaCard
+              src="/media/agent-constellation-loop.svg"
+              alt="Animated four-agent constellation around a central execution core."
+              kicker="Specialists"
+              title="Agents feel like a memorable cohort"
+              caption="Visual identity gives customers and builders an immediate sense of role boundaries."
+              compact
+            />
+            <MediaCard
+              src="/media/execution-reel-loop.svg"
+              alt="Animated execution conveyor showing intake, build, run, and review."
+              kicker="Execution"
+              title="Work moves through visible stages"
+              caption="The platform should imply motion, traceability, and operator trust from the first screen."
+              compact
+            />
+          </div>
+        </div>
       </section>
 
       <section className="panel">

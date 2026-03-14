@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#071122"/>
+      <stop offset="1" stop-color="#030711"/>
+    </linearGradient>
+    <style>
+      .copy{fill:#eef7ff;font-family:'Space Grotesk','IBM Plex Sans',sans-serif}
+      .meta{fill:#7db4ff;font-size:18px;letter-spacing:.28em;text-transform:uppercase}
+      .title{fill:#eef7ff;font-size:48px;font-weight:700}
+      .small{fill:#96aec8;font-size:22px}
+      .panel{fill:#0a1730;stroke:#7db4ff;stroke-opacity:.18;stroke-width:2}
+      .lane{stroke:#6ce8ff;stroke-opacity:.3;stroke-width:4;stroke-linecap:round}
+      .laneB{stroke:#89ffa8;stroke-opacity:.26;stroke-width:4;stroke-linecap:round}
+      .token{fill:#6ce8ff}
+      .tokenB{fill:#89ffa8}
+      .tokenC{fill:#8f7dff}
+    </style>
+  </defs>
+  <rect width="1600" height="900" rx="32" fill="url(#bg)"/>
+  <text x="84" y="102" class="copy meta">Execution Reel</text>
+  <text x="84" y="166" class="copy title">Demand moves through a visible conveyor, not a black box.</text>
+  <text x="84" y="206" class="copy small">Every stage should feel inspectable enough for customers and builders to imagine real work happening on-platform.</text>
+
+  <g>
+    <rect x="86" y="344" width="274" height="186" rx="28" class="panel"/>
+    <text x="122" y="386" class="copy meta" style="font-size:16px">01 intake</text>
+    <rect x="122" y="432" width="178" height="14" rx="7" fill="#16274a"/>
+    <rect x="122" y="464" width="126" height="12" rx="6" fill="#16274a"/>
+    <rect x="122" y="494" width="214" height="12" rx="6" fill="#16274a"/>
+  </g>
+  <g>
+    <rect x="450" y="344" width="274" height="186" rx="28" class="panel"/>
+    <text x="486" y="386" class="copy meta" style="font-size:16px">02 match + build</text>
+    <rect x="486" y="432" width="190" height="14" rx="7" fill="#16274a"/>
+    <rect x="486" y="464" width="152" height="12" rx="6" fill="#16274a"/>
+    <rect x="486" y="494" width="208" height="12" rx="6" fill="#16274a"/>
+  </g>
+  <g>
+    <rect x="814" y="344" width="274" height="186" rx="28" class="panel"/>
+    <text x="850" y="386" class="copy meta" style="font-size:16px">03 run trace</text>
+    <rect x="850" y="432" width="184" height="14" rx="7" fill="#16274a"/>
+    <rect x="850" y="464" width="144" height="12" rx="6" fill="#16274a"/>
+    <rect x="850" y="494" width="166" height="12" rx="6" fill="#16274a"/>
+  </g>
+  <g>
+    <rect x="1178" y="344" width="274" height="186" rx="28" class="panel"/>
+    <text x="1214" y="386" class="copy meta" style="font-size:16px">04 review gate</text>
+    <rect x="1214" y="432" width="168" height="14" rx="7" fill="#16274a"/>
+    <rect x="1214" y="464" width="132" height="12" rx="6" fill="#16274a"/>
+    <rect x="1214" y="494" width="204" height="12" rx="6" fill="#16274a"/>
+  </g>
+
+  <path class="lane" d="M360 437H450M724 437H814M1088 437H1178"/>
+  <g>
+    <circle r="9" class="token">
+      <animateMotion dur="9s" repeatCount="indefinite" path="M360 437H450M724 437H814M1088 437H1178"/>
+    </circle>
+    <circle r="7" class="tokenB">
+      <animateMotion dur="11s" repeatCount="indefinite" path="M360 469H450M724 469H814M1088 469H1178"/>
+    </circle>
+    <circle r="8" class="tokenC">
+      <animateMotion dur="13s" repeatCount="indefinite" path="M360 503H450M724 503H814M1088 503H1178"/>
+    </circle>
+  </g>
+
+  <path class="laneB" d="M240 634C430 706 592 728 800 728C1008 728 1176 704 1360 634"/>
+  <circle cx="240" cy="634" r="8" class="token"/>
+  <circle cx="1360" cy="634" r="8" class="tokenB"/>
+</svg>

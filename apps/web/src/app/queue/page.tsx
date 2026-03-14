@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MediaCard } from "../../components/media-card";
 import { getTaskRequests, getTaskRuns } from "../../lib/api";
 import { formatTimestamp, titleizeToken, toneClass } from "../../lib/presenters";
 
@@ -102,6 +103,30 @@ export default async function QueuePage({ searchParams }: QueuePageProps) {
             </strong>
           </article>
         </aside>
+      </section>
+
+      <section className="panel">
+        <div className="sectionhead">
+          <p className="eyebrow">Queue Atmosphere</p>
+          <h2>Execution should feel alive before a user reads the raw records</h2>
+        </div>
+        <div className="media-stage media-stage-balanced">
+          <MediaCard
+            src="/media/execution-reel-loop.svg"
+            alt="Animated execution reel showing visible stages between intake and review."
+            kicker="Execution loop"
+            title="A queue with cinematic momentum"
+            caption="The queue is not just a list. It is the visible machine where demand becomes routed, delivered, and judged."
+          />
+          <MediaCard
+            src="/media/control-theater-loop.svg"
+            alt="Animated AI control theater showing routing and review in one surface."
+            kicker="Operator deck"
+            title="Every queue card belongs to a bigger operational scene"
+            caption="The visuals give customers and builders a stronger sense of platform depth without policy-heavy copy."
+            compact
+          />
+        </div>
       </section>
 
       <section className="panel">

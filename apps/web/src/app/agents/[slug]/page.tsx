@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { MediaCard } from "../../../components/media-card";
 import { TaskIntakeForm } from "../../../components/task-intake-form";
 import { getAgentDetail } from "../../../lib/api";
 import { getAgentIntelligence } from "../../../lib/agent-intelligence";
@@ -71,6 +72,30 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
         </aside>
       </section>
 
+      <section className="panel">
+        <div className="sectionhead">
+          <p className="eyebrow">Concept Reel</p>
+          <h2>Make the role feel vivid before the form fields start</h2>
+        </div>
+        <div className="media-stage media-stage-balanced">
+          <MediaCard
+            src="/media/agent-constellation-loop.svg"
+            alt="Animated four-agent constellation showing specialist roles orbiting a central execution core."
+            kicker="Role system"
+            title={`${agent.name} sits inside a larger operating constellation`}
+            caption="The visual language keeps the user aware that each agent is a specialist lane, not a generic chatbot skin."
+          />
+          <MediaCard
+            src="/media/execution-reel-loop.svg"
+            alt="Animated execution reel emphasizing intake, build, run, and review."
+            kicker="Execution loop"
+            title="Different roles, same inspectable operational frame"
+            caption="The platform stays legible because all specialist lanes still land inside one visible delivery circuit."
+            compact
+          />
+        </div>
+      </section>
+
       <div className="surface-grid surface-grid-two">
         <section className="panel">
           <div className="sectionhead">
@@ -81,6 +106,12 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
             {humanizeToken(agent.provider.type)} / {agent.provider.name}
           </p>
           <p>{agent.provider.summary}</p>
+          <img
+            className="card-inline-media"
+            src="/media/builder-network-loop.svg"
+            alt=""
+            aria-hidden="true"
+          />
           {agent.provider.website ? (
             <p>
               <a className="cardlink" href={agent.provider.website}>
@@ -177,6 +208,12 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
               ))}
             </div>
           </div>
+          <img
+            className="panel-inline-visual"
+            src="/media/control-theater-loop.svg"
+            alt=""
+            aria-hidden="true"
+          />
         </section>
       ) : null}
 

@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#061020"/>
+      <stop offset="1" stop-color="#091326"/>
+    </linearGradient>
+    <style>
+      .copy{fill:#e7f3ff;font-family:'Space Grotesk','IBM Plex Sans',sans-serif}
+      .meta{fill:#7db4ff;font-size:16px;letter-spacing:.26em;text-transform:uppercase}
+      .title{fill:#edf8ff;font-size:38px;font-weight:700}
+      .small{fill:#95adc7;font-size:20px}
+      .card{fill:#0b1732;stroke:#7db4ff;stroke-opacity:.18;stroke-width:2}
+      .line{stroke:#6ce8ff;stroke-opacity:.3;stroke-width:2.5}
+      .lineB{stroke:#89ffa8;stroke-opacity:.3;stroke-width:2.5}
+      .node{fill:#091526;stroke:#6ce8ff;stroke-opacity:.5;stroke-width:2}
+      .accent{fill:#6ce8ff}
+      .accentB{fill:#89ffa8}
+      .accentC{fill:#8f7dff}
+    </style>
+  </defs>
+  <rect width="1200" height="900" rx="32" fill="url(#bg)"/>
+  <text x="80" y="94" class="copy meta">Builder Network</text>
+  <text x="80" y="150" class="copy title">Open supply-side, not a single-provider shell.</text>
+  <text x="80" y="186" class="copy small">Customers post demand. Builders respond with specialized agents. The platform curates trust and execution clarity.</text>
+
+  <g>
+    <path class="line" d="M206 410C340 410 382 330 514 330"/>
+    <path class="lineB" d="M206 410C340 410 382 490 514 490"/>
+    <path class="line" d="M650 330C782 330 820 410 994 410"/>
+    <path class="lineB" d="M650 490C782 490 820 410 994 410"/>
+  </g>
+
+  <g>
+    <rect x="88" y="318" width="166" height="182" rx="26" class="card"/>
+    <text x="118" y="350" class="copy meta" style="font-size:14px">Demand board</text>
+    <circle cx="136" cy="398" r="12" class="accent"/>
+    <rect x="160" y="390" width="62" height="10" rx="5" fill="#16274a"/>
+    <rect x="118" y="438" width="96" height="12" rx="6" fill="#16274a"/>
+    <rect x="118" y="466" width="76" height="12" rx="6" fill="#16274a"/>
+    <rect x="118" y="494" width="108" height="12" rx="6" fill="#16274a"/>
+  </g>
+
+  <g>
+    <rect x="490" y="238" width="184" height="184" rx="28" class="card"/>
+    <text x="520" y="272" class="copy meta" style="font-size:14px">Builder A</text>
+    <circle cx="550" cy="322" r="16" class="node"/>
+    <rect x="580" y="314" width="54" height="10" rx="5" class="accent"/>
+    <rect x="520" y="364" width="122" height="12" rx="6" fill="#16274a"/>
+    <rect x="520" y="392" width="94" height="12" rx="6" fill="#16274a"/>
+  </g>
+
+  <g>
+    <rect x="490" y="398" width="184" height="184" rx="28" class="card"/>
+    <text x="520" y="432" class="copy meta" style="font-size:14px">Builder B</text>
+    <circle cx="550" cy="482" r="16" class="node"/>
+    <rect x="580" y="474" width="54" height="10" rx="5" class="accentB"/>
+    <rect x="520" y="524" width="122" height="12" rx="6" fill="#16274a"/>
+    <rect x="520" y="552" width="94" height="12" rx="6" fill="#16274a"/>
+  </g>
+
+  <g>
+    <rect x="916" y="318" width="188" height="184" rx="28" class="card"/>
+    <text x="946" y="352" class="copy meta" style="font-size:14px">Platform catalog</text>
+    <rect x="946" y="390" width="126" height="14" rx="7" fill="#16274a"/>
+    <rect x="946" y="422" width="98" height="14" rx="7" fill="#16274a"/>
+    <rect x="946" y="454" width="138" height="14" rx="7" fill="#16274a"/>
+    <circle cx="1070" cy="398" r="7" class="accentC">
+      <animate attributeName="cy" values="398;390;398" dur="2.6s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <g opacity=".5">
+    <circle cx="598" cy="410" r="224" stroke="#6ce8ff" stroke-opacity=".12" stroke-width="2"/>
+    <circle cx="598" cy="410" r="276" stroke="#8f7dff" stroke-opacity=".12" stroke-width="2"/>
+  </g>
+</svg>

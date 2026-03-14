@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#071120"/>
+      <stop offset="1" stop-color="#030711"/>
+    </linearGradient>
+    <style>
+      .copy{fill:#eef7ff;font-family:'Space Grotesk','IBM Plex Sans',sans-serif}
+      .meta{fill:#7db4ff;font-size:18px;letter-spacing:.28em;text-transform:uppercase}
+      .title{fill:#eef7ff;font-size:52px;font-weight:700}
+      .small{fill:#95aec8;font-size:22px}
+      .panel{fill:#0b1732;stroke:#7db4ff;stroke-opacity:.18;stroke-width:2}
+      .wire{stroke:#6ce8ff;stroke-opacity:.3;stroke-width:3}
+      .accent{fill:#6ce8ff}
+      .accentB{fill:#89ffa8}
+      .accentC{fill:#8f7dff}
+    </style>
+  </defs>
+  <rect width="1600" height="900" rx="32" fill="url(#bg)"/>
+  <text x="82" y="100" class="copy meta">Maintenance Copilot</text>
+  <text x="82" y="168" class="copy title">Field guidance, knowledge retrieval, and work-order closure.</text>
+  <text x="82" y="210" class="copy small">If a frontline engineer can picture using it on site, the platform has already crossed an important trust threshold.</text>
+
+  <rect x="96" y="318" width="448" height="314" rx="34" class="panel"/>
+  <text x="136" y="362" class="copy meta" style="font-size:16px">Technician assist screen</text>
+  <rect x="152" y="414" width="128" height="182" rx="22" fill="#102043"/>
+  <rect x="314" y="414" width="182" height="16" rx="8" fill="#16274a"/>
+  <rect x="314" y="452" width="140" height="12" rx="6" fill="#16274a"/>
+  <rect x="314" y="484" width="164" height="12" rx="6" fill="#16274a"/>
+  <rect x="314" y="516" width="122" height="12" rx="6" fill="#16274a"/>
+
+  <rect x="682" y="286" width="820" height="326" rx="36" class="panel"/>
+  <text x="724" y="330" class="copy meta" style="font-size:16px">Knowledge + work-order engine</text>
+  <path d="M780 454h580" class="wire"/>
+  <circle cx="840" cy="454" r="10" class="accent"/>
+  <circle cx="980" cy="454" r="10" class="accentB"/>
+  <circle cx="1120" cy="454" r="10" class="accentC"/>
+  <rect x="760" y="388" width="196" height="86" rx="22" fill="#132243"/>
+  <rect x="1030" y="388" width="196" height="86" rx="22" fill="#132243"/>
+  <rect x="1300" y="388" width="136" height="86" rx="22" fill="#132243"/>
+
+  <rect x="904" y="662" width="346" height="130" rx="28" class="panel"/>
+  <text x="944" y="708" class="copy meta" style="font-size:16px">Closure recommendation</text>
+  <rect x="944" y="744" width="212" height="12" rx="6" fill="#16274a"/>
+</svg>

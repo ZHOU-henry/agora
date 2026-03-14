@@ -2,7 +2,10 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MediaCard } from "../../../components/media-card";
 import { getTaskRequest } from "../../../lib/api";
-import { formatTimestamp, humanizeToken, titleizeToken, toneClass } from "../../../lib/presenters";
+import { localizeAgent } from "../../../lib/catalog-copy";
+import { getCopy } from "../../../lib/copy";
+import { getLocale } from "../../../lib/locale";
+import { formatTimestamp, humanizeToken, toneClass } from "../../../lib/presenters";
 
 type TaskRequestPageProps = {
   params: Promise<{
@@ -11,6 +14,8 @@ type TaskRequestPageProps = {
 };
 
 export default async function TaskRequestPage({ params }: TaskRequestPageProps) {
+  const locale = await getLocale();
+  const copy = getCopy(locale);
   const { id } = await params;
   const taskRequest = await getTaskRequest(id);
 
@@ -18,56 +23,56 @@ export default async function TaskRequestPage({ params }: TaskRequestPageProps) 
     notFound();
   }
 
+  const localizedAgent = localizeAgent(taskRequest.agent, locale);
+
   return (
     <main className="page">
       <section className="hero hero-grid">
-        <div className="hero-copy">
-          <p className="eyebrow">Task Request</p>
+        <div className="hero-copy hero-copy-tight">
+          <p className="eyebrow">{copy.requestPage.eyebrow}</p>
           <h1>{taskRequest.title}</h1>
           <p className="lede">{taskRequest.description}</p>
           <div className="chiprow">
             <span className={`statuspill ${toneClass(taskRequest.status)}`}>
-              {titleizeToken(taskRequest.status)}
+              {humanizeToken(taskRequest.status, locale)}
             </span>
+            <span className="statuspill tone-neutral">agent / {localizedAgent.name}</span>
             <span className="statuspill tone-neutral">
-              agent / {taskRequest.agent.name}
+              {copy.queue.builderBy} / {localizedAgent.provider.name}
             </span>
-            <span className="statuspill tone-neutral">
-              builder / {taskRequest.agent.provider.name}
-            </span>
-            <span className="datachip">{formatTimestamp(taskRequest.createdAt)}</span>
+            <span className="datachip">{formatTimestamp(taskRequest.createdAt, locale)}</span>
           </div>
           <div className="buttonrow">
-            <Link href={`/agents/${taskRequest.agent.slug}`} className="actionlink">
-              Back to agent
+            <Link href={`/agents/${localizedAgent.slug}`} className="actionlink">
+              {copy.requestPage.backToAgent}
             </Link>
             <Link
-              href={`/providers/${taskRequest.agent.provider.slug}`}
+              href={`/providers/${localizedAgent.provider.slug}`}
               className="actionlink"
             >
-              Inspect builder
+              {copy.requestPage.inspectBuilder}
             </Link>
           </div>
         </div>
 
         <aside className="signalpanel">
-          <p className="panelkicker">Request state</p>
+          <p className="panelkicker">{copy.requestPage.state}</p>
           <div className="signalstack">
             <article className="signalitem">
-              <span>run records</span>
+              <span>{copy.requestPage.runRecords}</span>
               <strong>{taskRequest.runs.length}</strong>
             </article>
             <article className="signalitem">
-              <span>last update</span>
-              <strong>{formatTimestamp(taskRequest.updatedAt)}</strong>
+              <span>{copy.requestPage.lastUpdate}</span>
+              <strong>{formatTimestamp(taskRequest.updatedAt, locale)}</strong>
             </article>
             <article className="signalitem">
-              <span>provenance</span>
-              <strong>{humanizeToken(taskRequest.agent.provenanceStatus)}</strong>
+              <span>{copy.requestPage.provenance}</span>
+              <strong>{humanizeToken(localizedAgent.provenanceStatus, locale)}</strong>
             </article>
             <article className="signalitem">
-              <span>builder type</span>
-              <strong>{humanizeToken(taskRequest.agent.provider.type)}</strong>
+              <span>{copy.requestPage.builderType}</span>
+              <strong>{humanizeToken(localizedAgent.provider.type, locale)}</strong>
             </article>
           </div>
         </aside>
@@ -75,24 +80,23 @@ export default async function TaskRequestPage({ params }: TaskRequestPageProps) 
 
       <section className="panel">
         <div className="sectionhead">
-          <p className="eyebrow">Request Visualization</p>
-          <h2>Help the requester imagine what happens next</h2>
+          <p className="eyebrow">{copy.requestPage.visual.eyebrow}</p>
+          <h2>{copy.requestPage.visual.title}</h2>
         </div>
         <div className="media-stage media-stage-balanced">
           <MediaCard
             src="/media/control-theater-loop.svg"
-            alt="Animated control theater showing how a request enters the platform and reaches routing and review."
-            kicker="Request path"
-            title="A task request should suggest downstream motion"
-            caption="The page should imply routing, execution, and review even before the user opens a specific run."
+            alt="Animated control theater for request flow."
+            kicker={copy.requestPage.visual.request.kicker}
+            title={copy.requestPage.visual.request.title}
+            caption={copy.requestPage.visual.request.caption}
           />
           <MediaCard
             src="/media/builder-network-loop.svg"
-            alt="Animated builder network showing supply-side developers around a demand board."
-            kicker="Builder context"
-            title="Demand belongs inside a bigger supply-side market"
-            caption="This request is not just for one agent card; it belongs to a future marketplace of specialized builders."
-            compact
+            alt="Animated builder network for demand-to-supply context."
+            kicker={copy.requestPage.visual.market.kicker}
+            title={copy.requestPage.visual.market.title}
+            caption={copy.requestPage.visual.market.caption}
           />
         </div>
       </section>
@@ -100,41 +104,38 @@ export default async function TaskRequestPage({ params }: TaskRequestPageProps) 
       <div className="surface-grid surface-grid-two">
         <section className="panel">
           <div className="sectionhead">
-            <p className="eyebrow">Builder</p>
-            <h2>Supply-side owner</h2>
+            <p className="eyebrow">{copy.requestPage.builder.eyebrow}</p>
+            <h2>{copy.requestPage.builder.title}</h2>
           </div>
-          <p className="tagline">{taskRequest.agent.provider.name}</p>
-          <p>{taskRequest.agent.provider.summary}</p>
-          <Link
-            href={`/providers/${taskRequest.agent.provider.slug}`}
-            className="cardlink"
-          >
-            Open builder profile
+          <p className="tagline">{localizedAgent.provider.name}</p>
+          <p>{localizedAgent.provider.summary}</p>
+          <Link href={`/providers/${localizedAgent.provider.slug}`} className="cardlink">
+            {copy.requestPage.builder.open}
           </Link>
         </section>
 
         <section className="panel">
           <div className="sectionhead">
-            <p className="eyebrow">Context</p>
-            <h2>Task context</h2>
+            <p className="eyebrow">{copy.requestPage.context.eyebrow}</p>
+            <h2>{copy.requestPage.context.title}</h2>
           </div>
-          <p>{taskRequest.contextNote || "No extra context provided."}</p>
+          <p>{taskRequest.contextNote || copy.requestPage.context.empty}</p>
         </section>
 
         <section className="panel">
           <div className="sectionhead">
-            <p className="eyebrow">Provenance</p>
-            <h2>Agent provenance</h2>
+            <p className="eyebrow">{copy.requestPage.provenancePanel.eyebrow}</p>
+            <h2>{copy.requestPage.provenancePanel.title}</h2>
           </div>
-          <p className="tagline">{humanizeToken(taskRequest.agent.provenanceStatus)}</p>
-          <p>{taskRequest.agent.provenanceSummary}</p>
+          <p className="tagline">{humanizeToken(localizedAgent.provenanceStatus, locale)}</p>
+          <p>{localizedAgent.provenanceSummary}</p>
         </section>
       </div>
 
       <section className="panel">
         <div className="sectionhead">
-          <p className="eyebrow">Execution</p>
-          <h2>Run records</h2>
+          <p className="eyebrow">{copy.requestPage.execution.eyebrow}</p>
+          <h2>{copy.requestPage.execution.title}</h2>
         </div>
         <div className="timeline">
           {taskRequest.runs.map((run) => (
@@ -142,14 +143,16 @@ export default async function TaskRequestPage({ params }: TaskRequestPageProps) 
               <div className="timelinehead">
                 <p className="tagline">run / {run.id.slice(-6)}</p>
                 <span className={`statuspill ${toneClass(run.status)}`}>
-                  {titleizeToken(run.status)}
+                  {humanizeToken(run.status, locale)}
                 </span>
               </div>
-              <p className="tagline">builder / {taskRequest.agent.provider.name}</p>
-              <p>{run.latestMessage || "No message recorded yet."}</p>
-              <p className="timestamp">{formatTimestamp(run.createdAt)}</p>
+              <p className="tagline">
+                {copy.requestPage.execution.builderBy} / {localizedAgent.provider.name}
+              </p>
+              <p>{run.latestMessage || copy.requestPage.execution.noMessage}</p>
+              <p className="timestamp">{formatTimestamp(run.createdAt, locale)}</p>
               <Link href={`/runs/${run.id}`} className="cardlink">
-                Open run record
+                {copy.requestPage.execution.action}
               </Link>
             </article>
           ))}

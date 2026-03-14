@@ -7,18 +7,44 @@ import {
   type TaskRequestDetail
 } from "@agora/shared/domain";
 import { browserApiBasePath } from "../lib/api";
-import { formatTimestamp } from "../lib/presenters";
+import type { Locale } from "../lib/locale";
+import { formatTimestamp, humanizeToken } from "../lib/presenters";
 import { isReadOnlyPreviewMode } from "../lib/runtime";
 
 type TaskIntakeFormProps = {
   agentId: string;
   agentName: string;
+  locale: Locale;
+  copy: {
+    eyebrow: string;
+    title: (agentName: string) => string;
+    lede: string;
+    previewDisabled: string;
+    seededPrompts: string;
+    taskTitle: string;
+    taskTitlePlaceholder: string;
+    taskDescription: string;
+    taskDescriptionPlaceholder: string;
+    context: string;
+    contextPlaceholder: string;
+    submit: string;
+    submitting: string;
+    readOnly: string;
+    invalid: string;
+    failed: string;
+    successTitle: string;
+    successPrefix: string;
+    openRun: string;
+    createdAt: string;
+  };
   exampleTasks?: string[];
 };
 
 export function TaskIntakeForm({
   agentId,
   agentName,
+  locale,
+  copy,
   exampleTasks = []
 }: TaskIntakeFormProps) {
   const readOnlyPreview = isReadOnlyPreviewMode();
@@ -33,7 +59,7 @@ export function TaskIntakeForm({
     event.preventDefault();
 
     if (readOnlyPreview) {
-      setError("Preview mode is read-only.");
+      setError(copy.previewDisabled);
       return;
     }
 
@@ -48,7 +74,7 @@ export function TaskIntakeForm({
     });
 
     if (!parsed.success) {
-      setError("Please complete the task form with a clear title and description.");
+      setError(copy.invalid);
       return;
     }
 
@@ -71,7 +97,7 @@ export function TaskIntakeForm({
       const parsedItem = TaskRequestDetailSchema.safeParse(payload.item);
 
       if (!response.ok || !parsedItem.success) {
-        throw new Error(payload.error ?? "Task submission failed");
+        throw new Error(payload.error ?? copy.failed);
       }
 
       setSubmitted(parsedItem.data);
@@ -82,7 +108,7 @@ export function TaskIntakeForm({
       setError(
         submissionError instanceof Error
           ? submissionError.message
-          : "Task submission failed"
+          : copy.failed
       );
     } finally {
       setIsSubmitting(false);
@@ -92,21 +118,16 @@ export function TaskIntakeForm({
   return (
     <section className="panel">
       <div className="sectionhead">
-        <p className="eyebrow">Intake</p>
-        <h2>Submit a task to {agentName}</h2>
-        <p className="lede small">
-          Capture the operator goal, desired outcome, and any edge constraints before
-          routing work.
-        </p>
+        <p className="eyebrow">{copy.eyebrow}</p>
+        <h2>{copy.title(agentName)}</h2>
+        <p className="lede small">{copy.lede}</p>
       </div>
       {readOnlyPreview ? (
-        <p className="small">
-          Preview mode is active. Task submission is intentionally disabled.
-        </p>
+        <p className="small">{copy.previewDisabled}</p>
       ) : null}
       {exampleTasks.length > 0 ? (
         <div className="microstack">
-          <p className="microeyebrow">Launch from a seeded prompt</p>
+          <p className="microeyebrow">{copy.seededPrompts}</p>
           <div className="chiprow">
             {exampleTasks.map((task) => (
               <button
@@ -127,43 +148,43 @@ export function TaskIntakeForm({
       ) : null}
       <form className="form" onSubmit={handleSubmit}>
         <label>
-          <span>Task title</span>
+          <span>{copy.taskTitle}</span>
           <input
             value={title}
             onChange={(event) => setTitle(event.target.value)}
-            placeholder="Summarize the top risks in this workflow"
+            placeholder={copy.taskTitlePlaceholder}
             disabled={readOnlyPreview}
           />
         </label>
 
         <label>
-          <span>Task description</span>
+          <span>{copy.taskDescription}</span>
           <textarea
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             rows={6}
-            placeholder="Describe the task, goal, and what a good result should look like."
+            placeholder={copy.taskDescriptionPlaceholder}
             disabled={readOnlyPreview}
           />
         </label>
 
         <label>
-          <span>Optional context</span>
+          <span>{copy.context}</span>
           <textarea
             value={contextNote}
             onChange={(event) => setContextNote(event.target.value)}
             rows={4}
-            placeholder="Add any useful project context or constraints."
+            placeholder={copy.contextPlaceholder}
             disabled={readOnlyPreview}
           />
         </label>
 
         <button type="submit" disabled={isSubmitting || readOnlyPreview}>
           {readOnlyPreview
-            ? "Read-only preview"
+            ? copy.readOnly
             : isSubmitting
-              ? "Submitting..."
-              : "Submit task"}
+              ? copy.submitting
+              : copy.submit}
         </button>
       </form>
 
@@ -171,19 +192,21 @@ export function TaskIntakeForm({
 
       {submitted ? (
         <div className="receipt">
-          <h3>Task submitted</h3>
+          <h3>{copy.successTitle}</h3>
           <p>
-            Request <span className="inlinecode">{submitted.id}</span> is now{" "}
-            <strong>{submitted.status}</strong>.
+            {copy.successPrefix} <span className="inlinecode">{submitted.id}</span>{" "}
+            <strong>{humanizeToken(submitted.status, locale)}</strong>.
           </p>
           {submitted.runs[0] ? (
             <p>
               <a className="cardlink" href={`/runs/${submitted.runs[0].id}`}>
-                Open run record
+                {copy.openRun}
               </a>
             </p>
           ) : null}
-          <p className="tagline">Created at {formatTimestamp(submitted.createdAt)}</p>
+          <p className="tagline">
+            {copy.createdAt} {formatTimestamp(submitted.createdAt, locale)}
+          </p>
         </div>
       ) : null}
     </section>

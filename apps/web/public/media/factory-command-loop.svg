@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#071223"/>
+      <stop offset="1" stop-color="#030712"/>
+    </linearGradient>
+    <style>
+      .copy{fill:#eef7ff;font-family:'Space Grotesk','IBM Plex Sans',sans-serif}
+      .meta{fill:#7db4ff;font-size:18px;letter-spacing:.28em;text-transform:uppercase}
+      .title{fill:#eef7ff;font-size:52px;font-weight:700}
+      .small{fill:#95aec8;font-size:22px}
+      .panel{fill:#0b1732;stroke:#7db4ff;stroke-opacity:.18;stroke-width:2}
+      .line{stroke:#6ce8ff;stroke-opacity:.3;stroke-width:3}
+      .arm{stroke:#89ffa8;stroke-opacity:.7;stroke-width:12;stroke-linecap:round}
+      .accent{fill:#6ce8ff}
+      .accentB{fill:#89ffa8}
+      .accentC{fill:#ffd76e}
+    </style>
+  </defs>
+  <rect width="1600" height="900" rx="32" fill="url(#bg)"/>
+  <text x="82" y="100" class="copy meta">Smart Manufacturing</text>
+  <text x="82" y="168" class="copy title">Factory command, exception routing, shift coordination.</text>
+  <text x="82" y="210" class="copy small">A platform customer should immediately imagine production planning, line anomalies, and operator decisions flowing through agents.</text>
+
+  <g>
+    <rect x="78" y="320" width="352" height="220" rx="30" class="panel"/>
+    <text x="118" y="366" class="copy meta" style="font-size:16px">Demand console</text>
+    <rect x="118" y="408" width="236" height="16" rx="8" fill="#16274a"/>
+    <rect x="118" y="440" width="184" height="12" rx="6" fill="#16274a"/>
+    <rect x="118" y="472" width="252" height="12" rx="6" fill="#16274a"/>
+    <rect x="118" y="504" width="164" height="12" rx="6" fill="#16274a"/>
+  </g>
+
+  <g>
+    <rect x="520" y="292" width="548" height="308" rx="34" class="panel"/>
+    <text x="562" y="338" class="copy meta" style="font-size:16px">AI-enabled line orchestration</text>
+    <path d="M588 492h422" class="line"/>
+    <rect x="622" y="442" width="68" height="50" rx="14" fill="#132243"/>
+    <rect x="760" y="442" width="68" height="50" rx="14" fill="#132243"/>
+    <rect x="898" y="442" width="68" height="50" rx="14" fill="#132243"/>
+    <path d="M706 374l62 54-52 72" class="arm">
+      <animate attributeName="d" dur="5.2s" repeatCount="indefinite"
+        values="M706 374l62 54-52 72;M706 374l84 44-32 88;M706 374l62 54-52 72"/>
+    </path>
+    <path d="M898 376l-56 58 36 76" class="arm">
+      <animate attributeName="d" dur="4.6s" repeatCount="indefinite"
+        values="M898 376l-56 58 36 76;M898 376l-74 40 54 94;M898 376l-56 58 36 76"/>
+    </path>
+    <circle cx="690" cy="468" r="8" class="accent">
+      <animate attributeName="cx" values="690;828;966;690" dur="7s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <g>
+    <rect x="1160" y="320" width="362" height="220" rx="30" class="panel"/>
+    <text x="1202" y="366" class="copy meta" style="font-size:16px">Operator review</text>
+    <rect x="1202" y="404" width="242" height="14" rx="7" fill="#16274a"/>
+    <rect x="1202" y="434" width="186" height="12" rx="6" fill="#16274a"/>
+    <rect x="1202" y="466" width="208" height="12" rx="6" fill="#16274a"/>
+    <circle cx="1444" cy="408" r="8" class="accentB">
+      <animate attributeName="r" values="8;11;8" dur="2.4s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <path d="M430 430h90M1068 430h92" class="line"/>
+  <path d="M430 468h90M1068 468h92" class="line"/>
+  <path d="M430 506h90M1068 506h92" class="line"/>
+</svg>

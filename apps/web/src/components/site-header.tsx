@@ -2,18 +2,35 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LocaleSwitcher } from "./locale-switcher";
+import type { Locale } from "../lib/locale";
 import { toneClass } from "../lib/presenters";
 
 type SiteHeaderProps = {
   readOnlyPreview: boolean;
+  locale: Locale;
+  brandMeta: string;
+  navItems: Array<{
+    href: string;
+    label: string;
+  }>;
+  modeReadOnly: string;
+  modeInteractive: string;
+  localeLabel: string;
+  localeOptions: Record<Locale, string>;
 };
 
-export function SiteHeader({ readOnlyPreview }: SiteHeaderProps) {
+export function SiteHeader({
+  readOnlyPreview,
+  locale,
+  brandMeta,
+  navItems,
+  modeReadOnly,
+  modeInteractive,
+  localeLabel,
+  localeOptions
+}: SiteHeaderProps) {
   const pathname = usePathname();
-  const navItems = [
-    { href: "/", label: "Catalog" },
-    { href: "/queue", label: "Queue" }
-  ];
 
   return (
     <header className="siteheader">
@@ -23,7 +40,7 @@ export function SiteHeader({ readOnlyPreview }: SiteHeaderProps) {
           <Link href="/" className="brandlink">
             Agora
           </Link>
-          <span className="brandmeta">Operator control surface</span>
+          <span className="brandmeta">{brandMeta}</span>
         </div>
       </div>
       <nav className="sitenav">
@@ -42,13 +59,20 @@ export function SiteHeader({ readOnlyPreview }: SiteHeaderProps) {
           );
         })}
       </nav>
-      <span
-        className={`modechip ${toneClass(
-          readOnlyPreview ? "readonly" : "interactive"
-        )}`}
-      >
-        {readOnlyPreview ? "preview / read-only" : "local / interactive"}
-      </span>
+      <div className="header-controls">
+        <LocaleSwitcher
+          locale={locale}
+          label={localeLabel}
+          options={localeOptions}
+        />
+        <span
+          className={`modechip ${toneClass(
+            readOnlyPreview ? "readonly" : "interactive"
+          )}`}
+        >
+          {readOnlyPreview ? modeReadOnly : modeInteractive}
+        </span>
+      </div>
     </header>
   );
 }

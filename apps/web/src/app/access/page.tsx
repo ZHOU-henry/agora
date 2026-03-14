@@ -1,29 +1,31 @@
 import { AccessGate } from "../../components/access-gate";
 import { MediaCard } from "../../components/media-card";
+import { getCopy } from "../../lib/copy";
+import { getLocale } from "../../lib/locale";
 
-export default function AccessPage() {
+export default async function AccessPage() {
+  const locale = await getLocale();
+  const copy = getCopy(locale);
+
   return (
     <main className="page">
       <section className="hero hero-grid">
-        <div className="hero-copy">
-          <p className="eyebrow">Protected Preview</p>
-          <h1>Enter the access key to open the read-only deck.</h1>
-          <p className="lede">
-            This Agora preview is protected. Enter the password to continue into the
-            read-only demo surface.
-          </p>
+        <div className="hero-copy hero-copy-tight">
+          <p className="eyebrow">{copy.accessPage.eyebrow}</p>
+          <h1>{copy.accessPage.title}</h1>
+          <p className="lede">{copy.accessPage.lede}</p>
         </div>
 
         <aside className="signalpanel">
-          <p className="panelkicker">Preview posture</p>
+          <p className="panelkicker">{copy.accessPage.panelKicker}</p>
           <div className="signalstack">
             <article className="signalitem">
-              <span>mode</span>
-              <strong>read-only</strong>
+              <span>{copy.accessPage.modeLabel}</span>
+              <strong>{copy.accessPage.modeValue}</strong>
             </article>
             <article className="signalitem">
-              <span>writes</span>
-              <strong>blocked at API and UI layers</strong>
+              <span>{copy.accessPage.writesLabel}</span>
+              <strong>{copy.accessPage.writesValue}</strong>
             </article>
           </div>
         </aside>
@@ -31,19 +33,19 @@ export default function AccessPage() {
 
       <section className="panel">
         <div className="sectionhead">
-          <p className="eyebrow">Preview Visual</p>
-          <h2>A protected deck should still spark imagination</h2>
+          <p className="eyebrow">{copy.accessPage.mediaEyebrow}</p>
+          <h2>{copy.accessPage.mediaTitle}</h2>
         </div>
         <MediaCard
           src="/media/control-theater-loop.svg"
-          alt="Animated AI control theater used as a protected preview visual."
-          kicker="Protected reel"
-          title="Customers and builders should see the world before they read the system"
-          caption="The preview gate keeps the deck safe, but the visual layer still needs to communicate platform ambition instantly."
+          alt="Animated protected preview visual."
+          kicker={copy.accessPage.mediaKicker}
+          title={copy.accessPage.mediaCardTitle}
+          caption={copy.accessPage.mediaCaption}
         />
       </section>
 
-      <AccessGate />
+      <AccessGate locale={locale} copy={copy.accessGate} />
     </main>
   );
 }

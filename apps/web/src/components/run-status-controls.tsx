@@ -8,6 +8,7 @@ import {
   type TaskRunStatus
 } from "@agora/shared/domain";
 import { browserApiBasePath } from "../lib/api";
+import type { Locale } from "../lib/locale";
 import { titleizeToken, toneClass } from "../lib/presenters";
 import { isReadOnlyPreviewMode } from "../lib/runtime";
 
@@ -15,9 +16,29 @@ const statusOptions: TaskRunStatus[] = ["running", "completed", "failed"];
 
 type RunStatusControlsProps = {
   initialRun: TaskRunDetail;
+  locale: Locale;
+  copy: {
+    eyebrow: string;
+    title: string;
+    previewDisabled: string;
+    currentStatus: string;
+    statusMessage: string;
+    statusMessagePlaceholder: string;
+    resultSummary: string;
+    resultSummaryPlaceholder: string;
+    resultPayload: string;
+    resultPayloadPlaceholder: string;
+    invalidPayload: string;
+    invalidUpdate: string;
+    mark: (value: string) => string;
+  };
 };
 
-export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
+export function RunStatusControls({
+  initialRun,
+  locale,
+  copy
+}: RunStatusControlsProps) {
   const readOnlyPreview = isReadOnlyPreviewMode();
   const [run, setRun] = useState(initialRun);
   const [message, setMessage] = useState("");
@@ -30,7 +51,7 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
     setError("");
 
     if (readOnlyPreview) {
-      setError("Preview mode is read-only.");
+      setError(copy.previewDisabled);
       return;
     }
 
@@ -44,7 +65,7 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
           ? (JSON.parse(resultPayloadText) as Record<string, unknown>)
           : null;
     } catch {
-      setError("Result payload must be valid JSON.");
+      setError(copy.invalidPayload);
       setIsSubmitting(false);
       return;
     }
@@ -57,7 +78,7 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
     });
 
     if (!parsed.success) {
-      setError("Invalid status update.");
+      setError(copy.invalidUpdate);
       setIsSubmitting(false);
       return;
     }
@@ -102,46 +123,44 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
   return (
     <section className="panel">
       <div className="sectionhead">
-        <p className="eyebrow">Control</p>
-        <h2>Run controls</h2>
+        <p className="eyebrow">{copy.eyebrow}</p>
+        <h2>{copy.title}</h2>
       </div>
       {readOnlyPreview ? (
-        <p className="small">
-          Preview mode is active. Run state changes are disabled.
-        </p>
+        <p className="small">{copy.previewDisabled}</p>
       ) : null}
       <p className="tagline">
-        Current status:{" "}
+        {copy.currentStatus}:{" "}
         <span className={`statuspill ${toneClass(run.status)}`}>
-          {titleizeToken(run.status)}
+          {titleizeToken(run.status, locale)}
         </span>
       </p>
       <label className="stack">
-        <span>Status message</span>
+        <span>{copy.statusMessage}</span>
         <input
           value={message}
           onChange={(event) => setMessage(event.target.value)}
-          placeholder="Add an execution note"
+          placeholder={copy.statusMessagePlaceholder}
           disabled={readOnlyPreview}
         />
       </label>
       <label className="stack">
-        <span>Result summary</span>
+        <span>{copy.resultSummary}</span>
         <textarea
           value={resultSummary}
           onChange={(event) => setResultSummary(event.target.value)}
           rows={3}
-          placeholder="Capture the operator-facing outcome of this run."
+          placeholder={copy.resultSummaryPlaceholder}
           disabled={readOnlyPreview}
         />
       </label>
       <label className="stack">
-        <span>Result payload (JSON)</span>
+        <span>{copy.resultPayload}</span>
         <textarea
           value={resultPayloadText}
           onChange={(event) => setResultPayloadText(event.target.value)}
           rows={6}
-          placeholder='{"summary":"Task completed","confidence":"medium"}'
+          placeholder={copy.resultPayloadPlaceholder}
           disabled={readOnlyPreview}
         />
       </label>
@@ -153,7 +172,7 @@ export function RunStatusControls({ initialRun }: RunStatusControlsProps) {
             disabled={isSubmitting || readOnlyPreview}
             onClick={() => applyStatus(status)}
           >
-            Mark {titleizeToken(status)}
+            {copy.mark(titleizeToken(status, locale))}
           </button>
         ))}
       </div>

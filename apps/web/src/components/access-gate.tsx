@@ -2,8 +2,22 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import type { Locale } from "../lib/locale";
 
-export function AccessGate() {
+type AccessGateProps = {
+  locale: Locale;
+  copy: {
+    eyebrow: string;
+    title: string;
+    passwordLabel: string;
+    passwordPlaceholder: string;
+    unlockIdle: string;
+    unlockBusy: string;
+    accessDenied: string;
+  };
+};
+
+export function AccessGate({ locale, copy }: AccessGateProps) {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -26,13 +40,15 @@ export function AccessGate() {
       const payload = (await response.json()) as { ok?: boolean; error?: string };
 
       if (!response.ok || !payload.ok) {
-        throw new Error(payload.error ?? "Access denied");
+        throw new Error(payload.error ?? copy.accessDenied);
       }
 
       router.push("/");
       router.refresh();
     } catch (accessError) {
-      setError(accessError instanceof Error ? accessError.message : "Access denied");
+      setError(
+        accessError instanceof Error ? accessError.message : copy.accessDenied
+      );
     } finally {
       setIsSubmitting(false);
     }
@@ -41,22 +57,22 @@ export function AccessGate() {
   return (
     <section className="panel">
       <div className="sectionhead">
-        <p className="eyebrow">Authentication</p>
-        <h2>Preview access</h2>
+        <p className="eyebrow">{copy.eyebrow}</p>
+        <h2>{copy.title}</h2>
       </div>
       <form className="form" onSubmit={handleSubmit}>
         <label>
-          <span>Password</span>
+          <span>{copy.passwordLabel}</span>
           <input
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            placeholder="Enter preview password"
+            placeholder={copy.passwordPlaceholder}
             autoFocus
           />
         </label>
         <button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Unlocking..." : "Unlock preview"}
+          {isSubmitting ? copy.unlockBusy : copy.unlockIdle}
         </button>
       </form>
       {error ? <p className="error">{error}</p> : null}

@@ -4,6 +4,9 @@ import { MediaCard } from "../../../components/media-card";
 import { TaskIntakeForm } from "../../../components/task-intake-form";
 import { getAgentDetail } from "../../../lib/api";
 import { getAgentIntelligence } from "../../../lib/agent-intelligence";
+import { localizeAgent } from "../../../lib/catalog-copy";
+import { getCopy } from "../../../lib/copy";
+import { getLocale } from "../../../lib/locale";
 import { humanizeToken, toneClass } from "../../../lib/presenters";
 
 type AgentDetailPageProps = {
@@ -13,27 +16,34 @@ type AgentDetailPageProps = {
 };
 
 export default async function AgentDetailPage({ params }: AgentDetailPageProps) {
+  const locale = await getLocale();
+  const copy = getCopy(locale);
   const { slug } = await params;
   const agent = await getAgentDetail(slug);
-  const intelligence = getAgentIntelligence(slug);
 
   if (!agent) {
     notFound();
   }
 
+  const localizedAgent = localizeAgent(agent, locale);
+  const intelligence = getAgentIntelligence(slug, locale);
+
   return (
     <main className="page">
       <section className="hero hero-grid">
-        <div className="hero-copy">
-          <p className="eyebrow">Agent Profile</p>
-          <h1>{agent.name}</h1>
-          <p className="lede">{agent.description}</p>
+        <div className="hero-copy hero-copy-tight">
+          <p className="eyebrow">{copy.agentPage.eyebrow}</p>
+          <h1>{localizedAgent.name}</h1>
+          <p className="lede">{localizedAgent.description}</p>
           <div className="chiprow">
-            <span className={`statuspill ${toneClass(agent.status)}`}>{agent.status}</span>
-            <span className="statuspill tone-neutral">
-              provenance / {humanizeToken(agent.provenanceStatus)}
+            <span className={`statuspill ${toneClass(localizedAgent.status)}`}>
+              {humanizeToken(localizedAgent.status, locale)}
             </span>
-            {agent.tags.map((tag) => (
+            <span className="statuspill tone-neutral">
+              {copy.agentPage.provenance.statusLabel} /{" "}
+              {humanizeToken(localizedAgent.provenanceStatus, locale)}
+            </span>
+            {localizedAgent.tags.map((tag) => (
               <span key={tag} className="datachip">
                 {tag}
               </span>
@@ -41,32 +51,35 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
           </div>
           <div className="buttonrow">
             <Link href="/" className="actionlink">
-              Back to catalog
+              {copy.agentPage.back}
             </Link>
-            <Link href={`/providers/${agent.provider.slug}`} className="actionlink">
-              Inspect builder
+            <Link
+              href={`/providers/${localizedAgent.provider.slug}`}
+              className="actionlink"
+            >
+              {copy.agentPage.inspectBuilder}
             </Link>
           </div>
         </div>
 
         <aside className="signalpanel">
-          <p className="panelkicker">Agent frame</p>
+          <p className="panelkicker">{copy.agentPage.frame}</p>
           <div className="signalstack">
             <article className="signalitem">
-              <span>trust signals</span>
-              <strong>{agent.trustSignals.length}</strong>
+              <span>{copy.agentPage.trustSignals}</span>
+              <strong>{localizedAgent.trustSignals.length}</strong>
             </article>
             <article className="signalitem">
-              <span>constraints</span>
-              <strong>{agent.constraints.length}</strong>
+              <span>{copy.agentPage.constraints}</span>
+              <strong>{localizedAgent.constraints.length}</strong>
             </article>
             <article className="signalitem">
-              <span>catalog tags</span>
-              <strong>{agent.tags.join(" / ")}</strong>
+              <span>{copy.agentPage.tags}</span>
+              <strong>{localizedAgent.tags.join(" / ")}</strong>
             </article>
             <article className="signalitem">
-              <span>best first move</span>
-              <strong>{intelligence?.exampleTasks[0] ?? "Submit a scoped task"}</strong>
+              <span>{copy.agentPage.bestMove}</span>
+              <strong>{intelligence?.exampleTasks[0] ?? localizedAgent.summary}</strong>
             </article>
           </div>
         </aside>
@@ -74,24 +87,23 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
 
       <section className="panel">
         <div className="sectionhead">
-          <p className="eyebrow">Concept Reel</p>
-          <h2>Make the role feel vivid before the form fields start</h2>
+          <p className="eyebrow">{copy.agentPage.concept.eyebrow}</p>
+          <h2>{copy.agentPage.concept.title}</h2>
         </div>
         <div className="media-stage media-stage-balanced">
           <MediaCard
             src="/media/agent-constellation-loop.svg"
-            alt="Animated four-agent constellation showing specialist roles orbiting a central execution core."
-            kicker="Role system"
-            title={`${agent.name} sits inside a larger operating constellation`}
-            caption="The visual language keeps the user aware that each agent is a specialist lane, not a generic chatbot skin."
+            alt="Animated agent constellation."
+            kicker={copy.agentPage.concept.role.kicker}
+            title={copy.agentPage.concept.role.title}
+            caption={copy.agentPage.concept.role.caption}
           />
           <MediaCard
             src="/media/execution-reel-loop.svg"
-            alt="Animated execution reel emphasizing intake, build, run, and review."
-            kicker="Execution loop"
-            title="Different roles, same inspectable operational frame"
-            caption="The platform stays legible because all specialist lanes still land inside one visible delivery circuit."
-            compact
+            alt="Animated execution reel."
+            kicker={copy.agentPage.concept.loop.kicker}
+            title={copy.agentPage.concept.loop.title}
+            caption={copy.agentPage.concept.loop.caption}
           />
         </div>
       </section>
@@ -99,40 +111,41 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
       <div className="surface-grid surface-grid-two">
         <section className="panel">
           <div className="sectionhead">
-            <p className="eyebrow">Builder</p>
-            <h2>Supply-side owner</h2>
+            <p className="eyebrow">{copy.agentPage.builder.eyebrow}</p>
+            <h2>{copy.agentPage.builder.title}</h2>
           </div>
           <p className="tagline">
-            {humanizeToken(agent.provider.type)} / {agent.provider.name}
+            {humanizeToken(localizedAgent.provider.type, locale)} /{" "}
+            {localizedAgent.provider.name}
           </p>
-          <p>{agent.provider.summary}</p>
+          <p>{localizedAgent.provider.summary}</p>
           <img
             className="card-inline-media"
             src="/media/builder-network-loop.svg"
             alt=""
             aria-hidden="true"
           />
-          {agent.provider.website ? (
+          {localizedAgent.provider.website ? (
             <p>
-              <a className="cardlink" href={agent.provider.website}>
-                Visit builder site
+              <a className="cardlink" href={localizedAgent.provider.website}>
+                {copy.agentPage.builder.visitSite}
               </a>
             </p>
           ) : null}
           <p>
-            <Link className="cardlink" href={`/providers/${agent.provider.slug}`}>
-              Open builder profile
+            <Link className="cardlink" href={`/providers/${localizedAgent.provider.slug}`}>
+              {copy.agentPage.builder.openProfile}
             </Link>
           </p>
         </section>
 
         <section className="panel">
           <div className="sectionhead">
-            <p className="eyebrow">Assurance</p>
-            <h2>Trust signals</h2>
+            <p className="eyebrow">{copy.agentPage.assurance.eyebrow}</p>
+            <h2>{copy.agentPage.assurance.title}</h2>
           </div>
           <ul>
-            {agent.trustSignals.map((signal) => (
+            {localizedAgent.trustSignals.map((signal) => (
               <li key={signal}>{signal}</li>
             ))}
           </ul>
@@ -140,11 +153,11 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
 
         <section className="panel">
           <div className="sectionhead">
-            <p className="eyebrow">Boundaries</p>
-            <h2>Constraints</h2>
+            <p className="eyebrow">{copy.agentPage.boundaries.eyebrow}</p>
+            <h2>{copy.agentPage.boundaries.title}</h2>
           </div>
           <ul>
-            {agent.constraints.map((constraint) => (
+            {localizedAgent.constraints.map((constraint) => (
               <li key={constraint}>{constraint}</li>
             ))}
           </ul>
@@ -155,8 +168,8 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
         <div className="surface-grid surface-grid-two">
           <section className="panel">
             <div className="sectionhead">
-              <p className="eyebrow">Best Fit</p>
-              <h2>Where this agent is strongest</h2>
+              <p className="eyebrow">{copy.agentPage.fit.eyebrow}</p>
+              <h2>{copy.agentPage.fit.title}</h2>
             </div>
             <ul>
               {intelligence.idealFor.map((item) => (
@@ -167,8 +180,8 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
 
           <section className="panel">
             <div className="sectionhead">
-              <p className="eyebrow">Avoid Misrouting</p>
-              <h2>Where another agent should lead</h2>
+              <p className="eyebrow">{copy.agentPage.avoid.eyebrow}</p>
+              <h2>{copy.agentPage.avoid.title}</h2>
             </div>
             <ul>
               {intelligence.avoidFor.map((item) => (
@@ -182,14 +195,14 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
       {intelligence ? (
         <section className="panel">
           <div className="sectionhead">
-            <p className="eyebrow">Capability Profile</p>
-            <h2>Decision support</h2>
+            <p className="eyebrow">{copy.agentPage.capability.eyebrow}</p>
+            <h2>{copy.agentPage.capability.title}</h2>
           </div>
           <div className="scoregrid">
             {intelligence.capabilityScores.map((item) => (
               <article key={item.label} className="scorecard">
                 <div className="timelinehead">
-                  <p className="tagline">{item.label}</p>
+                  <p className="tagline">{humanizeToken(item.label, locale)}</p>
                   <strong>{item.score}</strong>
                 </div>
                 <div className="scorebar">
@@ -199,7 +212,7 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
             ))}
           </div>
           <div className="microstack">
-            <p className="microeyebrow">Example task prompts</p>
+            <p className="microeyebrow">{copy.agentPage.capability.prompts}</p>
             <div className="chiprow">
               {intelligence.exampleTasks.map((item) => (
                 <span key={item} className="datachip">
@@ -219,16 +232,21 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
 
       <section className="panel">
         <div className="sectionhead">
-          <p className="eyebrow">Provenance</p>
-          <h2>Source posture</h2>
+          <p className="eyebrow">{copy.agentPage.provenance.eyebrow}</p>
+          <h2>{copy.agentPage.provenance.title}</h2>
         </div>
-        <p className="tagline">Status: {humanizeToken(agent.provenanceStatus)}</p>
-        <p>{agent.provenanceSummary}</p>
+        <p className="tagline">
+          {copy.agentPage.provenance.statusLabel}:{" "}
+          {humanizeToken(localizedAgent.provenanceStatus, locale)}
+        </p>
+        <p>{localizedAgent.provenanceSummary}</p>
       </section>
 
       <TaskIntakeForm
-        agentId={agent.id}
-        agentName={agent.name}
+        agentId={localizedAgent.id}
+        agentName={localizedAgent.name}
+        locale={locale}
+        copy={copy.intakeForm}
         exampleTasks={intelligence?.exampleTasks}
       />
     </main>

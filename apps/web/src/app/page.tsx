@@ -1,13 +1,16 @@
 import Link from "next/link";
+import { MediaCard } from "../components/media-card";
 import {
   getAgentCatalog,
   getProviderCatalog,
   getTaskRequests,
   getTaskRuns
 } from "../lib/api";
-import { MediaCard } from "../components/media-card";
 import { getAgentIntelligence } from "../lib/agent-intelligence";
-import { formatTimestamp, humanizeToken, titleizeToken, toneClass } from "../lib/presenters";
+import { localizeAgent, localizeProvider } from "../lib/catalog-copy";
+import { getCopy } from "../lib/copy";
+import { getLocale } from "../lib/locale";
+import { formatTimestamp, humanizeToken, toneClass } from "../lib/presenters";
 
 type HomePageProps = {
   searchParams?: Promise<{
@@ -17,13 +20,24 @@ type HomePageProps = {
 };
 
 export default async function HomePage({ searchParams }: HomePageProps) {
+  const locale = await getLocale();
+  const copy = getCopy(locale);
   const params = (await searchParams) ?? {};
   const query = params.q?.trim().toLowerCase() ?? "";
   const focus = params.focus?.trim().toLowerCase() ?? "all";
-  const agents = await getAgentCatalog();
-  const providers = await getProviderCatalog();
-  const requests = await getTaskRequests();
-  const runs = await getTaskRuns();
+  const agents = (await getAgentCatalog()).map((agent) => localizeAgent(agent, locale));
+  const providers = (await getProviderCatalog()).map((provider) =>
+    localizeProvider(provider, locale)
+  );
+  const requests = (await getTaskRequests()).map((request) => ({
+    ...request,
+    agent: localizeAgent(request.agent, locale)
+  }));
+  const runs = (await getTaskRuns()).map((run) => ({
+    ...run,
+    agent: localizeAgent(run.agent, locale)
+  }));
+
   const reviewQueue = runs.filter(
     (run) =>
       (run.status === "completed" || run.status === "failed") &&
@@ -32,63 +46,36 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const activeRuns = runs.filter(
     (run) => run.status === "submitted" || run.status === "running"
   );
-  const launchSurfaces = [
-    {
-      title: "Catalog intelligence",
-      description: "Expose agent boundaries, trust signals, provenance posture, and routing intent."
-    },
-    {
-      title: "Task routing",
-      description: "Capture task demand with operator context and turn it into persistent execution records."
-    },
-    {
-      title: "Run telemetry",
-      description: "Track transitions, payloads, summaries, and execution state in a single control plane."
-    },
-    {
-      title: "Human review",
-      description: "Keep approval, rejection, and rework decisions inside the same operational surface."
-    }
-  ];
-  const pulse = [
-    { label: "builder profiles", value: String(providers.length).padStart(2, "0") },
-    { label: "catalog nodes", value: String(agents.length).padStart(2, "0") },
-    { label: "task requests", value: String(requests.length).padStart(2, "0") },
-    { label: "active runs", value: String(activeRuns.length).padStart(2, "0") },
-    { label: "awaiting review", value: String(reviewQueue.length).padStart(2, "0") }
-  ];
-  const focusFilters = [
-    { value: "all", label: "all lanes" },
-    { value: "strategy", label: "strategy" },
-    { value: "research", label: "research" },
-    { value: "code", label: "implementation" },
-    { value: "sources", label: "source rigor" },
-    { value: "review", label: "review" },
-    { value: "governance", label: "governance" }
-  ];
+
   const enrichedAgents = agents.map((agent) => ({
     ...agent,
-    intelligence: getAgentIntelligence(agent.slug)
+    intelligence: getAgentIntelligence(agent.slug, locale)
   }));
+
   const filteredAgents = enrichedAgents.filter((agent) => {
     const searchable = [
       agent.name,
       agent.summary,
       agent.description,
+      agent.provider.name,
       agent.tags.join(" "),
       agent.intelligence?.idealFor.join(" ") ?? "",
       agent.intelligence?.exampleTasks.join(" ") ?? ""
     ]
       .join(" ")
       .toLowerCase();
+
     const matchesQuery = query.length === 0 || searchable.includes(query);
     const matchesFocus =
       focus === "all" ||
       agent.tags.some((tag) => tag.toLowerCase() === focus) ||
-      agent.intelligence?.capabilityScores.some((score) => score.label === focus);
+      agent.intelligence?.capabilityScores.some(
+        (score) => score.label.toLowerCase() === focus
+      );
 
     return matchesQuery && matchesFocus;
   });
+
   const comparisonRows = enrichedAgents.map((agent) => ({
     agent,
     primaryCapability:
@@ -99,69 +86,76 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
   return (
     <main className="page">
-      <section className="hero hero-grid">
-        <div className="hero-copy">
-          <p className="eyebrow">Agora // Operator Deck</p>
-          <h1>Run an AI agent marketplace from a cinematic control surface.</h1>
-          <p className="lede">
-            Agora is a narrow operator-facing MVP for cataloging agent capabilities,
-            routing work, and reviewing execution traces without losing provenance or
-            operational clarity. The current demo starts with a seeded first-party
-            cohort, but the platform direction is open to outside AI agent developers
-            building specialized agents for real customer demand.
-          </p>
+      <section className="hero hero-grid hero-grid-wide">
+        <div className="hero-copy hero-copy-tight">
+          <p className="eyebrow">{copy.home.eyebrow}</p>
+          <h1>{copy.home.title}</h1>
+          <p className="lede">{copy.home.lede}</p>
           <div className="buttonrow">
             <Link href="/queue" className="actionlink actionlink-primary">
-              Open command queue
+              {copy.home.primaryAction}
             </Link>
-            <Link href="/agents/athena" className="actionlink">
-              Inspect Athena
+            <Link href="/providers" className="actionlink">
+              {copy.home.secondaryAction}
             </Link>
           </div>
           <div className="chiprow">
-            <span className="datachip">phase-1 control model</span>
-            <span className="datachip">persistent task lifecycle</span>
-            <span className="datachip">operator review in-loop</span>
-            <span className="datachip">seeded now, open developer-side later</span>
+            {copy.home.heroChips.map((chip) => (
+              <span key={chip} className="datachip">
+                {chip}
+              </span>
+            ))}
           </div>
         </div>
 
         <aside className="signalpanel">
-          <p className="panelkicker">System pulse</p>
+          <p className="panelkicker">System Pulse</p>
           <div className="stats stats-grid">
-            {pulse.map((item) => (
-              <div key={item.label} className="stat">
-                <strong>{item.value}</strong>
-                <span>{item.label}</span>
-              </div>
-            ))}
+            <div className="stat">
+              <strong>{providers.length}</strong>
+              <span>builders</span>
+            </div>
+            <div className="stat">
+              <strong>{agents.length}</strong>
+              <span>agents</span>
+            </div>
+            <div className="stat">
+              <strong>{activeRuns.length}</strong>
+              <span>active</span>
+            </div>
+            <div className="stat">
+              <strong>{reviewQueue.length}</strong>
+              <span>review</span>
+            </div>
           </div>
           <div className="signalstack">
             <article className="signalitem">
-              <span>review lane</span>
+              <span>{copy.home.pulse.reviewLane}</span>
               <strong>
                 {reviewQueue.length > 0
-                  ? `${reviewQueue.length} run${
-                      reviewQueue.length > 1 ? "s" : ""
-                    } need operator attention`
-                  : "No runs blocked on review"}
+                  ? copy.home.pulse.reviewQueue(reviewQueue.length)
+                  : copy.home.pulse.idle}
+              </strong>
+            </article>
+            <article className="signalitem">
+              <span>{copy.home.pulse.catalogStatus}</span>
+              <strong>
+                {agents.every((agent) => agent.status === "active")
+                  ? copy.home.pulse.live
+                  : humanizeToken("draft", locale)}
               </strong>
             </article>
             <article className="signalitem">
               <span>routing posture</span>
               <strong>
                 {activeRuns.length > 0
-                  ? `${activeRuns.length} active execution threads`
-                  : "Idle and ready for new intake"}
+                  ? copy.home.pulse.activeThreads(activeRuns.length)
+                  : copy.home.pulse.idle}
               </strong>
             </article>
             <article className="signalitem">
-              <span>catalog status</span>
-              <strong>{agents.every((agent) => agent.status === "active") ? "Live" : "Mixed"}</strong>
-            </article>
-            <article className="signalitem">
               <span>supply model</span>
-              <strong>first-party seeded, multi-developer by design</strong>
+              <strong>{copy.home.pulse.supplyModel}</strong>
             </article>
           </div>
         </aside>
@@ -169,44 +163,41 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
       <section className="panel">
         <div className="sectionhead">
-          <p className="eyebrow">Visual Brief</p>
-          <h2>Show the platform before asking people to read it</h2>
-          <p className="lede small">
-            The launch experience should feel like a living agent market, not a stack
-            of paragraphs about one.
-          </p>
+          <p className="eyebrow">{copy.home.visual.eyebrow}</p>
+          <h2>{copy.home.visual.title}</h2>
+          <p className="lede small">{copy.home.visual.lede}</p>
         </div>
-        <div className="media-stage">
+        <div className="media-stage media-stage-spread">
           <MediaCard
             src="/media/control-theater-loop.svg"
-            alt="Animated control theater showing customer demand, builder supply, routing, and review."
-            kicker="Hero loop"
-            title="A control surface with customer demand and builder supply in one frame"
-            caption="This establishes the whole fantasy fast: incoming need, routing intelligence, outside builders, and visible review."
+            alt="Animated control theater showing demand, builders, routing, and review."
+            kicker={copy.home.visual.cards.hero.kicker}
+            title={copy.home.visual.cards.hero.title}
+            caption={copy.home.visual.cards.hero.caption}
           />
           <div className="media-grid-compact">
             <MediaCard
               src="/media/builder-network-loop.svg"
-              alt="Animated builder network showing multiple developers responding to a demand board."
-              kicker="Supply side"
-              title="Multiple builders, not one private stack"
-              caption="The product now signals an open developer-side future instead of a single-provider shell."
+              alt="Animated builder network."
+              kicker={copy.home.visual.cards.supply.kicker}
+              title={copy.home.visual.cards.supply.title}
+              caption={copy.home.visual.cards.supply.caption}
               compact
             />
             <MediaCard
               src="/media/agent-constellation-loop.svg"
-              alt="Animated four-agent constellation around a central execution core."
-              kicker="Specialists"
-              title="Agents feel like a memorable cohort"
-              caption="Visual identity gives customers and builders an immediate sense of role boundaries."
+              alt="Animated agent constellation."
+              kicker={copy.home.visual.cards.cohort.kicker}
+              title={copy.home.visual.cards.cohort.title}
+              caption={copy.home.visual.cards.cohort.caption}
               compact
             />
             <MediaCard
               src="/media/execution-reel-loop.svg"
-              alt="Animated execution conveyor showing intake, build, run, and review."
-              kicker="Execution"
-              title="Work moves through visible stages"
-              caption="The platform should imply motion, traceability, and operator trust from the first screen."
+              alt="Animated execution reel."
+              kicker={copy.home.visual.cards.execution.kicker}
+              title={copy.home.visual.cards.execution.title}
+              caption={copy.home.visual.cards.execution.caption}
               compact
             />
           </div>
@@ -215,65 +206,60 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
       <section className="panel">
         <div className="sectionhead">
-          <p className="eyebrow">Launch Surfaces</p>
-          <h2>Phase-1 product surfaces</h2>
-          <p className="lede small">
-            The current ship target stays intentionally narrow, but every surface is
-            designed to support a larger future operating model.
-          </p>
+          <p className="eyebrow">{copy.home.industries.eyebrow}</p>
+          <h2>{copy.home.industries.title}</h2>
+          <p className="lede small">{copy.home.industries.lede}</p>
         </div>
-        <div className="grid">
-          {launchSurfaces.map((surface) => (
-            <article key={surface.title} className="card">
-              <p className="tagline">surface</p>
-              <h3>{surface.title}</h3>
-              <p>{surface.description}</p>
-            </article>
+        <div className="grid media-grid-showcase">
+          {copy.home.industries.cards.map((item) => (
+            <MediaCard
+              key={item.src}
+              src={item.src}
+              alt={item.title}
+              kicker={item.kicker}
+              title={item.title}
+              caption={item.caption}
+              compact
+            />
           ))}
         </div>
       </section>
 
       <section className="panel">
         <div className="sectionhead">
-          <p className="eyebrow">Routing</p>
-          <h2>Find the right operator lane fast</h2>
-          <p className="lede small">
-            Search by intent, filter by strength, and route work using explicit fit
-            signals instead of guesswork.
-          </p>
+          <p className="eyebrow">{copy.home.routing.eyebrow}</p>
+          <h2>{copy.home.routing.title}</h2>
+          <p className="lede small">{copy.home.routing.lede}</p>
         </div>
         <form className="controlform" action="/" method="get">
           <label className="stack">
-            <span>Search catalog</span>
+            <span>{copy.home.routing.searchLabel}</span>
             <input
               type="search"
               name="q"
               defaultValue={params.q ?? ""}
-              placeholder="Search by use case, tag, or example task"
+              placeholder={copy.home.routing.searchPlaceholder}
             />
           </label>
           <label className="stack">
-            <span>Focus lane</span>
+            <span>{copy.home.routing.focusLabel}</span>
             <select name="focus" defaultValue={focus}>
-              {focusFilters.map((item) => (
+              {copy.home.routing.focusFilters.map((item) => (
                 <option key={item.value} value={item.value}>
                   {item.label}
                 </option>
               ))}
             </select>
           </label>
-          <button type="submit">Apply routing filter</button>
+          <button type="submit">{copy.home.routing.apply}</button>
         </form>
       </section>
 
       <section className="panel">
         <div className="sectionhead">
-          <p className="eyebrow">Supply Side</p>
-          <h2>Builder profiles behind the launch cohort</h2>
-          <p className="lede small">
-            Agora starts with seeded first-party supply, but the platform model is built
-            around multiple outside builders publishing specialized agents over time.
-          </p>
+          <p className="eyebrow">{copy.home.providers.eyebrow}</p>
+          <h2>{copy.home.providers.title}</h2>
+          <p className="lede small">{copy.home.providers.lede}</p>
         </div>
         <div className="grid">
           {providers.map((provider) => (
@@ -281,21 +267,22 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               <div className="cardtopline">
                 <span className="microeyebrow">builder</span>
                 <span className={`statuspill ${toneClass(provider.status)}`}>
-                  {provider.status}
+                  {humanizeToken(provider.status, locale)}
                 </span>
               </div>
               <h3>{provider.name}</h3>
               <p>{provider.summary}</p>
-              <p className="provenance">Type: {humanizeToken(provider.type)}</p>
-              <div className="chiprow">
-                {provider.tags.map((tag) => (
-                  <span key={tag} className="datachip">
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              <p className="provenance">
+                {copy.home.providers.typeLabel}: {humanizeToken(provider.type, locale)}
+              </p>
+              <img
+                className="card-inline-media"
+                src="/media/builder-network-loop.svg"
+                alt=""
+                aria-hidden="true"
+              />
               <Link href={`/providers/${provider.slug}`} className="cardlink">
-                Inspect builder profile
+                {copy.home.providers.action}
               </Link>
             </article>
           ))}
@@ -304,28 +291,31 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
       <section className="panel">
         <div className="sectionhead">
-          <p className="eyebrow">Agent Catalog</p>
-          <h2>Seeded first-party operators with explicit role boundaries</h2>
-          <p className="lede small">
-            Every card exposes the role, provenance posture, and trust framing required
-            before an operator routes work. This launch cohort is the first supply-side
-            layer, not the final limit of who can build on the platform.
-          </p>
+          <p className="eyebrow">{copy.home.agents.eyebrow}</p>
+          <h2>{copy.home.agents.title}</h2>
+          <p className="lede small">{copy.home.agents.lede}</p>
         </div>
-        {filteredAgents.length === 0 ? (
-          <p>No agents match the current routing filter.</p>
-        ) : null}
+        {filteredAgents.length === 0 ? <p>{copy.home.agents.empty}</p> : null}
         <div className="grid">
-          {filteredAgents.map((agent, index) => (
+          {filteredAgents.map((agent) => (
             <article key={agent.id} className="card">
               <div className="cardtopline">
-                <span className="microeyebrow">{String(index + 1).padStart(2, "0")}</span>
-                <span className={`statuspill ${toneClass(agent.status)}`}>{agent.status}</span>
+                <span className="microeyebrow">agent</span>
+                <span className={`statuspill ${toneClass(agent.status)}`}>
+                  {humanizeToken(agent.status, locale)}
+                </span>
               </div>
               <h3>{agent.name}</h3>
               <p>{agent.summary}</p>
-              <p className="tagline">Built by {agent.provider.name}</p>
-              <p className="provenance">Provenance: {humanizeToken(agent.provenanceStatus)}</p>
+              <p className="tagline">
+                {copy.home.agents.builtBy} / {agent.provider.name}
+              </p>
+              <img
+                className="card-inline-media"
+                src="/media/agent-constellation-loop.svg"
+                alt=""
+                aria-hidden="true"
+              />
               <div className="chiprow">
                 {agent.tags.map((tag) => (
                   <span key={tag} className="datachip">
@@ -334,16 +324,15 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 ))}
               </div>
               {agent.intelligence ? (
-                <div className="microstack">
-                  <p className="microeyebrow">Best fit</p>
-                  <p>{agent.intelligence.idealFor[0]}</p>
-                </div>
+                <p className="small">
+                  {copy.home.agents.bestFit}: {agent.intelligence.idealFor[0]}
+                </p>
               ) : null}
               <Link href={`/providers/${agent.provider.slug}`} className="cardlink">
-                View builder
+                {copy.home.agents.providerAction}
               </Link>
               <Link href={`/agents/${agent.slug}`} className="cardlink">
-                Inspect and submit task
+                {copy.home.agents.action}
               </Link>
             </article>
           ))}
@@ -352,12 +341,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
       <section className="panel">
         <div className="sectionhead">
-          <p className="eyebrow">Decision Layer</p>
-          <h2>Operator comparison matrix</h2>
-          <p className="lede small">
-            Use the matrix to decide whether the task needs direction, evidence, or code
-            before you route it.
-          </p>
+          <p className="eyebrow">{copy.home.comparison.eyebrow}</p>
+          <h2>{copy.home.comparison.title}</h2>
+          <p className="lede small">{copy.home.comparison.lede}</p>
         </div>
         <div className="comparisonlist">
           {comparisonRows.map(({ agent, primaryCapability }) => (
@@ -367,16 +353,16 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                 <p>{agent.intelligence?.differentiators[0] ?? agent.summary}</p>
               </div>
               <div className="comparison-metric">
-                <span className="microeyebrow">primary edge</span>
+                <span className="microeyebrow">{copy.home.comparison.primaryEdge}</span>
                 <strong>
                   {primaryCapability
-                    ? `${primaryCapability.label} / ${primaryCapability.score}`
-                    : "n/a"}
+                    ? `${humanizeToken(primaryCapability.label, locale)} / ${primaryCapability.score}`
+                    : copy.home.comparison.fallback}
                 </strong>
               </div>
               <div className="comparison-metric">
-                <span className="microeyebrow">ideal first move</span>
-                <strong>{agent.intelligence?.exampleTasks[0] ?? "Inspect profile"}</strong>
+                <span className="microeyebrow">{copy.home.comparison.firstMove}</span>
+                <strong>{agent.intelligence?.exampleTasks[0] ?? copy.home.comparison.fallback}</strong>
               </div>
             </article>
           ))}
@@ -385,37 +371,37 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
       <section className="panel">
         <div className="sectionhead">
-          <p className="eyebrow">Live Workstream</p>
-          <h2>Recent intake and review traffic</h2>
-          <p className="lede small">
-            The operator queue is the live bridge between demand intake, execution, and
-            post-run judgment.
-          </p>
+          <p className="eyebrow">{copy.home.workstream.eyebrow}</p>
+          <h2>{copy.home.workstream.title}</h2>
+          <p className="lede small">{copy.home.workstream.lede}</p>
         </div>
         <div className="surface-grid surface-grid-two">
           <section className="stackpanel">
             <div className="stackpanel-head">
-              <h3>Recent task requests</h3>
+              <h3>{copy.home.workstream.requestsTitle}</h3>
               <Link href="/queue" className="cardlink">
-                Open queue
+                {copy.home.workstream.requestsAction}
               </Link>
             </div>
             <div className="timeline">
               {requests.length === 0 ? (
-                <p>No task requests have been submitted yet.</p>
+                <p>{copy.home.workstream.noRequests}</p>
               ) : (
                 requests.slice(0, 4).map((request) => (
                   <article key={request.id} className="timelineitem">
                     <div className="timelinehead">
                       <p className="tagline">{request.agent.name}</p>
                       <span className={`statuspill ${toneClass(request.status)}`}>
-                        {titleizeToken(request.status)}
+                        {humanizeToken(request.status, locale)}
                       </span>
                     </div>
+                    <p className="tagline">
+                      {copy.queue.builderBy} / {request.agent.provider.name}
+                    </p>
                     <p>{request.title}</p>
-                    <p className="timestamp">{formatTimestamp(request.createdAt)}</p>
+                    <p className="timestamp">{formatTimestamp(request.createdAt, locale)}</p>
                     <Link href={`/requests/${request.id}`} className="cardlink">
-                      View task request
+                      {copy.home.workstream.requestAction}
                     </Link>
                   </article>
                 ))
@@ -425,26 +411,29 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
           <section className="stackpanel">
             <div className="stackpanel-head">
-              <h3>Review-ready runs</h3>
-              <span className="microeyebrow">priority lane</span>
+              <h3>{copy.home.workstream.reviewTitle}</h3>
+              <span className="microeyebrow">{copy.home.workstream.reviewLane}</span>
             </div>
             <div className="timeline">
               {reviewQueue.length === 0 ? (
-                <p>No runs are waiting for review.</p>
+                <p>{copy.home.workstream.noReview}</p>
               ) : (
                 reviewQueue.slice(0, 4).map((run) => (
                   <article key={run.id} className="timelineitem">
                     <div className="timelinehead">
                       <p className="tagline">{run.agent.name}</p>
                       <span className={`statuspill ${toneClass(run.status)}`}>
-                        {titleizeToken(run.status)}
+                        {humanizeToken(run.status, locale)}
                       </span>
                     </div>
+                    <p className="tagline">
+                      {copy.queue.builderBy} / {run.agent.provider.name}
+                    </p>
                     <p>{run.taskTitle}</p>
-                    <p>{run.resultSummary || "No result summary yet."}</p>
-                    <p className="timestamp">{formatTimestamp(run.updatedAt)}</p>
+                    <p>{run.resultSummary || copy.home.workstream.noSummary}</p>
+                    <p className="timestamp">{formatTimestamp(run.updatedAt, locale)}</p>
                     <Link href={`/runs/${run.id}`} className="cardlink">
-                      Review run
+                      {copy.home.workstream.reviewAction}
                     </Link>
                   </article>
                 ))

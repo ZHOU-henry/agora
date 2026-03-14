@@ -186,6 +186,54 @@ a {
   gap: 10px;
 }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.locale-switcher {
+  display: grid;
+  gap: 6px;
+  justify-items: end;
+}
+
+.locale-label {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.locale-options {
+  display: inline-flex;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid rgba(125, 180, 255, 0.14);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.locale-chip {
+  min-height: 32px;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.locale-chip-active {
+  background: rgba(108, 232, 255, 0.14);
+  color: var(--ink);
+}
+
 .navlink {
   position: relative;
   display: inline-flex;
@@ -265,6 +313,10 @@ a {
   align-items: stretch;
 }
 
+.hero-grid-wide {
+  grid-template-columns: minmax(0, 1.72fr) minmax(320px, 0.84fr);
+}
+
 .hero-copy,
 .signalpanel,
 .stackpanel,
@@ -288,6 +340,10 @@ a {
 
 .hero-copy {
   padding: 34px;
+}
+
+.hero-copy-tight .lede {
+  max-width: 56rem;
 }
 
 .hero-copy::before,
@@ -469,8 +525,16 @@ a {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.media-stage-spread {
+  grid-template-columns: minmax(0, 1.32fr) minmax(340px, 0.9fr);
+}
+
 .media-grid-compact {
   grid-template-columns: 1fr;
+}
+
+.media-grid-showcase {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .media-card {
@@ -587,6 +651,10 @@ a {
   margin-top: 18px;
   min-height: 220px;
   object-fit: cover;
+}
+
+.media-grid-showcase .media-card .media-frame {
+  min-height: 260px;
 }
 
 .sectionhead {
@@ -1025,7 +1093,9 @@ a {
   .hero-grid,
   .surface-grid-two,
   .media-stage,
-  .media-stage-balanced {
+  .media-stage-balanced,
+  .media-stage-spread,
+  .media-grid-showcase {
     grid-template-columns: 1fr;
   }
 
@@ -1036,6 +1106,12 @@ a {
 
   .modechip {
     justify-self: start;
+  }
+
+  .header-controls,
+  .locale-switcher {
+    justify-self: start;
+    justify-items: start;
   }
 }
 

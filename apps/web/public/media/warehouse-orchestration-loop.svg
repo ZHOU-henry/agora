@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#06101f"/>
+      <stop offset="1" stop-color="#040814"/>
+    </linearGradient>
+    <style>
+      .copy{fill:#eef7ff;font-family:'Space Grotesk','IBM Plex Sans',sans-serif}
+      .meta{fill:#7db4ff;font-size:18px;letter-spacing:.28em;text-transform:uppercase}
+      .title{fill:#eef7ff;font-size:52px;font-weight:700}
+      .small{fill:#95aec8;font-size:22px}
+      .panel{fill:#0b1732;stroke:#7db4ff;stroke-opacity:.18;stroke-width:2}
+      .belt{stroke:#6ce8ff;stroke-opacity:.28;stroke-width:5;stroke-linecap:round}
+      .accent{fill:#6ce8ff}
+      .accentB{fill:#89ffa8}
+      .accentC{fill:#ffd76e}
+    </style>
+  </defs>
+  <rect width="1600" height="900" rx="32" fill="url(#bg)"/>
+  <text x="82" y="100" class="copy meta">Warehouse Orchestration</text>
+  <text x="82" y="168" class="copy title">Order surges, slotting logic, and shift dispatch.</text>
+  <text x="82" y="210" class="copy small">A warehouse customer should see Agent products that understand throughput pressure, not just generic automation language.</text>
+
+  <rect x="90" y="332" width="420" height="248" rx="30" class="panel"/>
+  <text x="126" y="374" class="copy meta" style="font-size:16px">Demand pulse</text>
+  <rect x="126" y="426" width="214" height="14" rx="7" fill="#16274a"/>
+  <rect x="126" y="458" width="282" height="12" rx="6" fill="#16274a"/>
+  <rect x="126" y="490" width="186" height="12" rx="6" fill="#16274a"/>
+
+  <rect x="592" y="286" width="920" height="308" rx="36" class="panel"/>
+  <text x="632" y="328" class="copy meta" style="font-size:16px">Flow coordination</text>
+  <path d="M660 462h784" class="belt"/>
+  <rect x="742" y="386" width="126" height="92" rx="18" fill="#132243"/>
+  <rect x="980" y="386" width="126" height="92" rx="18" fill="#132243"/>
+  <rect x="1218" y="386" width="126" height="92" rx="18" fill="#132243"/>
+  <circle cx="742" cy="462" r="10" class="accent">
+    <animateMotion dur="6.6s" repeatCount="indefinite" path="M0 0H596"/>
+  </circle>
+  <circle cx="742" cy="462" r="7" class="accentB">
+    <animateMotion dur="9s" repeatCount="indefinite" path="M0 0H596"/>
+  </circle>
+
+  <rect x="860" y="640" width="360" height="148" rx="28" class="panel"/>
+  <text x="900" y="686" class="copy meta" style="font-size:16px">Dispatch recommendations</text>
+  <rect x="900" y="726" width="226" height="12" rx="6" fill="#16274a"/>
+  <rect x="900" y="754" width="174" height="12" rx="6" fill="#16274a"/>
+  <circle cx="1164" cy="732" r="8" class="accentC"/>
+</svg>

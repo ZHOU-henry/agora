@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="900" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#061120"/>
+      <stop offset="1" stop-color="#030713"/>
+    </linearGradient>
+    <style>
+      .copy{fill:#eef7ff;font-family:'Space Grotesk','IBM Plex Sans',sans-serif}
+      .meta{fill:#7db4ff;font-size:18px;letter-spacing:.28em;text-transform:uppercase}
+      .title{fill:#eef7ff;font-size:52px;font-weight:700}
+      .small{fill:#95aec8;font-size:22px}
+      .panel{fill:#0b1732;stroke:#7db4ff;stroke-opacity:.18;stroke-width:2}
+      .grid{stroke:#7db4ff;stroke-opacity:.12;stroke-width:1}
+      .scan{stroke:#6ce8ff;stroke-opacity:.35;stroke-width:3}
+      .accent{fill:#ff8cb6}
+      .accentB{fill:#89ffa8}
+      .accentC{fill:#6ce8ff}
+    </style>
+  </defs>
+  <rect width="1600" height="900" rx="32" fill="url(#bg)"/>
+  <text x="82" y="100" class="copy meta">Vision Quality</text>
+  <text x="82" y="168" class="copy title">Defect review, image reasoning, and issue closure.</text>
+  <text x="82" y="210" class="copy small">The platform should make industrial quality work feel like a compelling agent product, not a generic AI claim.</text>
+
+  <rect x="118" y="294" width="584" height="402" rx="34" class="panel"/>
+  <g opacity=".5">
+    <path d="M146 358h528M146 426h528M146 494h528M146 562h528M146 630h528" class="grid"/>
+    <path d="M226 322v346M334 322v346M442 322v346M550 322v346" class="grid"/>
+  </g>
+  <rect x="252" y="410" width="284" height="188" rx="26" fill="#102043"/>
+  <circle cx="480" cy="490" r="18" class="accent">
+    <animate attributeName="r" values="18;26;18" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <path d="M190 344h456" class="scan">
+    <animate attributeName="d" values="M190 344h456;M190 646h456;M190 344h456" dur="6.2s" repeatCount="indefinite"/>
+  </path>
+
+  <rect x="820" y="318" width="702" height="354" rx="34" class="panel"/>
+  <text x="860" y="362" class="copy meta" style="font-size:16px">Defect reasoning + operator escalation</text>
+  <rect x="860" y="416" width="320" height="16" rx="8" fill="#16274a"/>
+  <rect x="860" y="452" width="236" height="12" rx="6" fill="#16274a"/>
+  <rect x="860" y="486" width="408" height="12" rx="6" fill="#16274a"/>
+  <rect x="860" y="520" width="286" height="12" rx="6" fill="#16274a"/>
+  <rect x="860" y="592" width="602" height="1" fill="#20355d"/>
+  <circle cx="1366" cy="424" r="9" class="accentB"/>
+  <circle cx="1398" cy="424" r="9" class="accentC"/>
+</svg>

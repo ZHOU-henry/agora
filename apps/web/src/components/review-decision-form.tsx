@@ -8,6 +8,7 @@ import {
   type TaskRunDetail
 } from "@agora/shared/domain";
 import { browserApiBasePath } from "../lib/api";
+import type { Locale } from "../lib/locale";
 import { formatTimestamp, titleizeToken, toneClass } from "../lib/presenters";
 import { isReadOnlyPreviewMode } from "../lib/runtime";
 
@@ -15,9 +16,30 @@ const verdicts: ReviewVerdict[] = ["approved", "needs_work", "rejected"];
 
 type ReviewDecisionFormProps = {
   initialRun: TaskRunDetail;
+  locale: Locale;
+  copy: {
+    eyebrow: string;
+    title: string;
+    previewDisabled: string;
+    verdict: string;
+    notes: string;
+    notesPlaceholder: string;
+    invalid: string;
+    submit: string;
+    submitting: string;
+    readOnly: string;
+    latest: string;
+    verdictLabel: string;
+    noNotes: string;
+    reviewedAt: string;
+  };
 };
 
-export function ReviewDecisionForm({ initialRun }: ReviewDecisionFormProps) {
+export function ReviewDecisionForm({
+  initialRun,
+  locale,
+  copy
+}: ReviewDecisionFormProps) {
   const readOnlyPreview = isReadOnlyPreviewMode();
   const [run, setRun] = useState(initialRun);
   const [verdict, setVerdict] = useState<ReviewVerdict>("approved");
@@ -29,7 +51,7 @@ export function ReviewDecisionForm({ initialRun }: ReviewDecisionFormProps) {
     event.preventDefault();
 
     if (readOnlyPreview) {
-      setError("Preview mode is read-only.");
+      setError(copy.previewDisabled);
       return;
     }
 
@@ -42,7 +64,7 @@ export function ReviewDecisionForm({ initialRun }: ReviewDecisionFormProps) {
     });
 
     if (!parsed.success) {
-      setError("Invalid review input.");
+      setError(copy.invalid);
       setIsSubmitting(false);
       return;
     }
@@ -86,17 +108,15 @@ export function ReviewDecisionForm({ initialRun }: ReviewDecisionFormProps) {
   return (
     <section className="panel">
       <div className="sectionhead">
-        <p className="eyebrow">Review</p>
-        <h2>Operator review</h2>
+        <p className="eyebrow">{copy.eyebrow}</p>
+        <h2>{copy.title}</h2>
       </div>
       {readOnlyPreview ? (
-        <p className="small">
-          Preview mode is active. Review submission is disabled.
-        </p>
+        <p className="small">{copy.previewDisabled}</p>
       ) : null}
       <form className="form" onSubmit={handleSubmit}>
         <label>
-          <span>Verdict</span>
+          <span>{copy.verdict}</span>
           <select
             value={verdict}
             onChange={(event) => setVerdict(event.target.value as ReviewVerdict)}
@@ -104,44 +124,44 @@ export function ReviewDecisionForm({ initialRun }: ReviewDecisionFormProps) {
           >
             {verdicts.map((value) => (
               <option key={value} value={value}>
-                {value}
+                {titleizeToken(value, locale)}
               </option>
             ))}
           </select>
         </label>
 
         <label>
-          <span>Notes</span>
+          <span>{copy.notes}</span>
           <textarea
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
             rows={4}
-            placeholder="Capture the operator judgment for this run."
+            placeholder={copy.notesPlaceholder}
             disabled={readOnlyPreview}
           />
         </label>
 
         <button type="submit" disabled={isSubmitting || readOnlyPreview}>
           {readOnlyPreview
-            ? "Read-only preview"
+            ? copy.readOnly
             : isSubmitting
-              ? "Submitting..."
-              : "Submit review"}
+              ? copy.submitting
+              : copy.submit}
         </button>
       </form>
 
       {run.reviewDecision ? (
         <div className="receipt">
-          <h3>Latest review</h3>
+          <h3>{copy.latest}</h3>
           <p>
-            Verdict:{" "}
+            {copy.verdictLabel}:{" "}
             <span className={`statuspill ${toneClass(run.reviewDecision.verdict)}`}>
-              {titleizeToken(run.reviewDecision.verdict)}
+              {titleizeToken(run.reviewDecision.verdict, locale)}
             </span>
           </p>
-          <p>{run.reviewDecision.notes || "No review notes captured."}</p>
+          <p>{run.reviewDecision.notes || copy.noNotes}</p>
           <p className="tagline">
-            Reviewed at {formatTimestamp(run.reviewDecision.reviewedAt)}
+            {copy.reviewedAt} {formatTimestamp(run.reviewDecision.reviewedAt, locale)}
           </p>
         </div>
       ) : null}

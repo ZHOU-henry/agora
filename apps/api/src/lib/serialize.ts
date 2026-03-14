@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import type {
   AgentDefinition,
+  EngagementAgreementRecord,
   DemandBoardItem,
   DemandResponseRecord,
   EngagementDetail,
@@ -24,6 +25,7 @@ type DbEngagement = Prisma.EngagementGetPayload<Record<string, never>>;
 type DbEngagementMilestone = Prisma.EngagementMilestoneGetPayload<Record<string, never>>;
 type DbEngagementDeliverable = Prisma.EngagementDeliverableGetPayload<Record<string, never>>;
 type DbEngagementReview = Prisma.EngagementReviewGetPayload<Record<string, never>>;
+type DbEngagementAgreement = Prisma.EngagementAgreementGetPayload<Record<string, never>>;
 type DbTaskRequest = Prisma.TaskRequestGetPayload<Record<string, never>>;
 type DbTaskRun = Prisma.TaskRunGetPayload<Record<string, never>>;
 type DbRunEvent = Prisma.RunEventGetPayload<Record<string, never>>;
@@ -161,6 +163,23 @@ export function serializeEngagementReviewRecord(
     notes: review.notes,
     createdAt: review.createdAt.toISOString(),
     deliverableId: review.deliverableId ?? null
+  };
+}
+
+export function serializeEngagementAgreementRecord(
+  agreement: DbEngagementAgreement
+): EngagementAgreementRecord {
+  return {
+    id: agreement.id,
+    engagementId: agreement.engagementId,
+    status: agreement.status as EngagementAgreementRecord["status"],
+    engagementMode: agreement.engagementMode,
+    billingModel: agreement.billingModel,
+    budgetLabel: agreement.budgetLabel,
+    startWindow: agreement.startWindow,
+    notes: agreement.notes,
+    createdAt: agreement.createdAt.toISOString(),
+    updatedAt: agreement.updatedAt.toISOString()
   };
 }
 
@@ -324,6 +343,7 @@ export function serializeEngagementDetail(
     milestones: DbEngagementMilestone[];
     deliverables: DbEngagementDeliverable[];
     reviews: DbEngagementReview[];
+    agreement: DbEngagementAgreement | null;
   }
 ): EngagementDetail {
   return {
@@ -345,7 +365,10 @@ export function serializeEngagementDetail(
     demandResponse: serializeDemandResponseRecord(engagement.demandResponse),
     milestones: engagement.milestones.map(serializeEngagementMilestoneRecord),
     deliverables: engagement.deliverables.map(serializeEngagementDeliverableRecord),
-    reviews: engagement.reviews.map(serializeEngagementReviewRecord)
+    reviews: engagement.reviews.map(serializeEngagementReviewRecord),
+    agreement: engagement.agreement
+      ? serializeEngagementAgreementRecord(engagement.agreement)
+      : null
   };
 }
 

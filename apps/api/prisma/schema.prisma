@@ -105,6 +105,7 @@ model Engagement {
   milestones   EngagementMilestone[]
   deliverables EngagementDeliverable[]
   reviews      EngagementReview[]
+  agreement    EngagementAgreement?
 }
 
 model EngagementMilestone {
@@ -146,6 +147,21 @@ model EngagementReview {
 
   deliverableId String?
   deliverable   EngagementDeliverable? @relation(fields: [deliverableId], references: [id], onDelete: SetNull)
+}
+
+model EngagementAgreement {
+  id            String   @id @default(cuid())
+  status        String
+  engagementMode String
+  billingModel  String
+  budgetLabel   String
+  startWindow   String
+  notes         String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  engagementId String @unique
+  engagement   Engagement @relation(fields: [engagementId], references: [id], onDelete: Cascade)
 }
 
 model TaskRun {

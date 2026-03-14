@@ -120,6 +120,11 @@ export const EngagementReviewVerdictSchema = z.enum([
   "needs_work"
 ]);
 
+export const EngagementAgreementStatusSchema = z.enum([
+  "draft",
+  "confirmed"
+]);
+
 export const TaskRequestInputSchema = z.object({
   agentId: z.string().min(1),
   title: z.string().min(3).max(120),
@@ -241,6 +246,23 @@ export const EngagementReviewRecordSchema = z.object({
 
 export type EngagementReviewRecord = z.infer<
   typeof EngagementReviewRecordSchema
+>;
+
+export const EngagementAgreementRecordSchema = z.object({
+  id: z.string(),
+  engagementId: z.string(),
+  status: EngagementAgreementStatusSchema,
+  engagementMode: z.string(),
+  billingModel: z.string(),
+  budgetLabel: z.string(),
+  startWindow: z.string(),
+  notes: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string()
+});
+
+export type EngagementAgreementRecord = z.infer<
+  typeof EngagementAgreementRecordSchema
 >;
 
 export const EngagementReviewInputSchema = z.object({
@@ -384,7 +406,8 @@ export const EngagementDetailSchema = EngagementRecordSchema.extend({
   demandResponse: DemandResponseRecordSchema,
   milestones: z.array(EngagementMilestoneRecordSchema),
   deliverables: z.array(EngagementDeliverableRecordSchema),
-  reviews: z.array(EngagementReviewRecordSchema)
+  reviews: z.array(EngagementReviewRecordSchema),
+  agreement: EngagementAgreementRecordSchema.nullable()
 });
 
 export type EngagementDetail = z.infer<typeof EngagementDetailSchema>;

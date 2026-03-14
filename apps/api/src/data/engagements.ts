@@ -55,7 +55,8 @@ export async function getEngagementById(id: string) {
         orderBy: {
           createdAt: "asc"
         }
-      }
+      },
+      agreement: true
     }
   });
 
@@ -95,7 +96,8 @@ async function fetchEngagementDetail(id: string) {
         orderBy: {
           createdAt: "asc"
         }
-      }
+      },
+      agreement: true
     }
   });
 

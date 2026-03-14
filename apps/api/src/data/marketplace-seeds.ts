@@ -378,5 +378,30 @@ export async function syncSeededMarketplaceData() {
         }
       });
     }
+
+    await prisma.engagementAgreement.upsert({
+      where: {
+        engagementId: engagement.id
+      },
+      update: {
+        status: "confirmed",
+        engagementMode: "pilot",
+        billingModel: "fixed scope",
+        budgetLabel: "RMB 80k - 150k",
+        startWindow: "within 2 weeks",
+        notes:
+          "Commercial frame is still intentionally light, but the customer and builder have aligned on a bounded pilot and a first budget band."
+      },
+      create: {
+        engagementId: engagement.id,
+        status: "confirmed",
+        engagementMode: "pilot",
+        billingModel: "fixed scope",
+        budgetLabel: "RMB 80k - 150k",
+        startWindow: "within 2 weeks",
+        notes:
+          "Commercial frame is still intentionally light, but the customer and builder have aligned on a bounded pilot and a first budget band."
+      }
+    });
   }
 }

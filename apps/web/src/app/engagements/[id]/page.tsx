@@ -182,6 +182,42 @@ export default async function EngagementDetailPage({
         </div>
       </section>
 
+      {engagement.agreement ? (
+        <section className="panel">
+          <div className="sectionhead">
+            <p className="eyebrow">{locale === "zh" ? "商务确认" : "Commercial frame"}</p>
+            <h2>
+              {locale === "zh"
+                ? "让承接对象具备最小的商业成立条件"
+                : "Give the engagement a minimal commercial reality"}
+            </h2>
+          </div>
+          <div className="surface-grid surface-grid-two">
+            <article className="card">
+              <h3>{locale === "zh" ? "合作方式" : "Engagement mode"}</h3>
+              <p>{engagement.agreement.engagementMode}</p>
+            </article>
+            <article className="card">
+              <h3>{locale === "zh" ? "计费方式" : "Billing model"}</h3>
+              <p>{engagement.agreement.billingModel}</p>
+            </article>
+            <article className="card">
+              <h3>{locale === "zh" ? "预算区间" : "Budget band"}</h3>
+              <p>{engagement.agreement.budgetLabel}</p>
+            </article>
+            <article className="card">
+              <h3>{locale === "zh" ? "启动窗口" : "Start window"}</h3>
+              <p>{engagement.agreement.startWindow}</p>
+            </article>
+          </div>
+          <p className="tagline">
+            {locale === "zh" ? "商务状态" : "Commercial status"} /{" "}
+            {humanizeToken(engagement.agreement.status, locale)}
+          </p>
+          <p>{engagement.agreement.notes}</p>
+        </section>
+      ) : null}
+
       <section className="panel">
         <div className="sectionhead">
           <p className="eyebrow">{locale === "zh" ? "审核回路" : "Review loop"}</p>

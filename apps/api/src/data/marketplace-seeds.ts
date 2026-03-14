@@ -302,5 +302,81 @@ export async function syncSeededMarketplaceData() {
         }
       });
     }
+
+    const deliverables = [
+      {
+        id: `deliverable-${response.taskRequestId}-scope`,
+        title: "Pilot scope brief",
+        summary: "Define the first bounded delivery scope, rollout limits, and operator touchpoints.",
+        artifactType: "brief",
+        status: "approved"
+      },
+      {
+        id: `deliverable-${response.taskRequestId}-workflow`,
+        title: "Workflow prototype",
+        summary: "The first runnable workflow artifact for customer-side evaluation.",
+        artifactType: "prototype",
+        status: "in_review"
+      }
+    ] as const;
+
+    for (const deliverable of deliverables) {
+      await prisma.engagementDeliverable.upsert({
+        where: {
+          id: deliverable.id
+        },
+        update: {
+          title: deliverable.title,
+          summary: deliverable.summary,
+          artifactType: deliverable.artifactType,
+          status: deliverable.status,
+          engagementId: engagement.id
+        },
+        create: {
+          id: deliverable.id,
+          title: deliverable.title,
+          summary: deliverable.summary,
+          artifactType: deliverable.artifactType,
+          status: deliverable.status,
+          engagementId: engagement.id
+        }
+      });
+    }
+
+    const reviews = [
+      {
+        id: `review-${response.taskRequestId}-scope`,
+        verdict: "approved",
+        notes: "Scope is tight enough for a first pilot and aligned with the customer's actual operating pain.",
+        deliverableId: `deliverable-${response.taskRequestId}-scope`
+      },
+      {
+        id: `review-${response.taskRequestId}-workflow`,
+        verdict: "needs_work",
+        notes: "Workflow prototype is promising, but operator explanations still need sharper language before rollout.",
+        deliverableId: `deliverable-${response.taskRequestId}-workflow`
+      }
+    ] as const;
+
+    for (const review of reviews) {
+      await prisma.engagementReview.upsert({
+        where: {
+          id: review.id
+        },
+        update: {
+          verdict: review.verdict,
+          notes: review.notes,
+          engagementId: engagement.id,
+          deliverableId: review.deliverableId
+        },
+        create: {
+          id: review.id,
+          verdict: review.verdict,
+          notes: review.notes,
+          engagementId: engagement.id,
+          deliverableId: review.deliverableId
+        }
+      });
+    }
   }
 }

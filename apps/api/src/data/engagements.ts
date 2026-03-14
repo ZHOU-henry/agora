@@ -40,6 +40,16 @@ export async function getEngagementById(id: string) {
         orderBy: {
           createdAt: "asc"
         }
+      },
+      deliverables: {
+        orderBy: {
+          createdAt: "asc"
+        }
+      },
+      reviews: {
+        orderBy: {
+          createdAt: "asc"
+        }
       }
     }
   });

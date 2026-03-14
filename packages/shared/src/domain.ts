@@ -78,6 +78,19 @@ export const EngagementMilestoneStatusSchema = z.enum([
   "completed"
 ]);
 
+export const EngagementDeliverableStatusSchema = z.enum([
+  "planned",
+  "in_progress",
+  "in_review",
+  "approved",
+  "needs_work"
+]);
+
+export const EngagementReviewVerdictSchema = z.enum([
+  "approved",
+  "needs_work"
+]);
+
 export const TaskRequestInputSchema = z.object({
   agentId: z.string().min(1),
   title: z.string().min(3).max(120),
@@ -155,6 +168,34 @@ export const EngagementMilestoneRecordSchema = z.object({
 
 export type EngagementMilestoneRecord = z.infer<
   typeof EngagementMilestoneRecordSchema
+>;
+
+export const EngagementDeliverableRecordSchema = z.object({
+  id: z.string(),
+  engagementId: z.string(),
+  title: z.string(),
+  summary: z.string(),
+  artifactType: z.string(),
+  status: EngagementDeliverableStatusSchema,
+  createdAt: z.string(),
+  updatedAt: z.string()
+});
+
+export type EngagementDeliverableRecord = z.infer<
+  typeof EngagementDeliverableRecordSchema
+>;
+
+export const EngagementReviewRecordSchema = z.object({
+  id: z.string(),
+  engagementId: z.string(),
+  verdict: EngagementReviewVerdictSchema,
+  notes: z.string(),
+  createdAt: z.string(),
+  deliverableId: z.string().nullable().optional()
+});
+
+export type EngagementReviewRecord = z.infer<
+  typeof EngagementReviewRecordSchema
 >;
 
 export const TaskRunStatusSchema = z.enum([
@@ -288,7 +329,9 @@ export const EngagementDetailSchema = EngagementRecordSchema.extend({
   taskRequest: TaskRequestRecordSchema,
   agent: AgentDefinitionSchema,
   demandResponse: DemandResponseRecordSchema,
-  milestones: z.array(EngagementMilestoneRecordSchema)
+  milestones: z.array(EngagementMilestoneRecordSchema),
+  deliverables: z.array(EngagementDeliverableRecordSchema),
+  reviews: z.array(EngagementReviewRecordSchema)
 });
 
 export type EngagementDetail = z.infer<typeof EngagementDetailSchema>;

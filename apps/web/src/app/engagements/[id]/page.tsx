@@ -156,6 +156,64 @@ export default async function EngagementDetailPage({
 
       <section className="panel">
         <div className="sectionhead">
+          <p className="eyebrow">{locale === "zh" ? "交付物" : "Deliverables"}</p>
+          <h2>
+            {locale === "zh"
+              ? "把承接转化成可审阅的具体成果"
+              : "Turn the engagement into concrete, reviewable outputs"}
+          </h2>
+        </div>
+        <div className="timeline">
+          {engagement.deliverables.map((deliverable) => (
+            <article key={deliverable.id} className="timelineitem">
+              <div className="timelinehead">
+                <p className="tagline">{deliverable.title}</p>
+                <span className={`statuspill ${toneClass(deliverable.status)}`}>
+                  {humanizeToken(deliverable.status, locale)}
+                </span>
+              </div>
+              <p>{deliverable.summary}</p>
+              <p className="tagline">
+                {locale === "zh" ? "产物类型" : "Artifact type"} / {deliverable.artifactType}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="sectionhead">
+          <p className="eyebrow">{locale === "zh" ? "审核回路" : "Review loop"}</p>
+          <h2>
+            {locale === "zh"
+              ? "交付物必须经过清晰的审核记录"
+              : "Each deliverable needs a visible audit trail"}
+          </h2>
+        </div>
+        <div className="timeline">
+          {engagement.reviews.map((review) => (
+            <article key={review.id} className="timelineitem">
+              <div className="timelinehead">
+                <p className="tagline">
+                  {locale === "zh" ? "审核结论" : "Review verdict"}
+                </p>
+                <span className={`statuspill ${toneClass(review.verdict)}`}>
+                  {humanizeToken(review.verdict, locale)}
+                </span>
+              </div>
+              <p>{review.notes}</p>
+              {review.deliverableId ? (
+                <p className="tagline">
+                  {locale === "zh" ? "对应交付物" : "Deliverable"} / {review.deliverableId}
+                </p>
+              ) : null}
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="sectionhead">
           <p className="eyebrow">{t.proposal}</p>
           <h2>{locale === "zh" ? "关联信息" : "Connected context"}</h2>
         </div>

@@ -4,8 +4,10 @@ import type {
   DemandBoardItem,
   DemandResponseRecord,
   EngagementDetail,
+  EngagementDeliverableRecord,
   EngagementMilestoneRecord,
   EngagementRecord,
+  EngagementReviewRecord,
   ProviderAgentReference,
   ProviderProfile,
   ProviderProfileDetail,
@@ -20,6 +22,8 @@ type DbProvider = Prisma.ProviderProfileGetPayload<Record<string, never>>;
 type DbDemandResponse = Prisma.DemandResponseGetPayload<Record<string, never>>;
 type DbEngagement = Prisma.EngagementGetPayload<Record<string, never>>;
 type DbEngagementMilestone = Prisma.EngagementMilestoneGetPayload<Record<string, never>>;
+type DbEngagementDeliverable = Prisma.EngagementDeliverableGetPayload<Record<string, never>>;
+type DbEngagementReview = Prisma.EngagementReviewGetPayload<Record<string, never>>;
 type DbTaskRequest = Prisma.TaskRequestGetPayload<Record<string, never>>;
 type DbTaskRun = Prisma.TaskRunGetPayload<Record<string, never>>;
 type DbRunEvent = Prisma.RunEventGetPayload<Record<string, never>>;
@@ -129,6 +133,34 @@ export function serializeEngagementMilestoneRecord(
     dueLabel: milestone.dueLabel ?? "",
     createdAt: milestone.createdAt.toISOString(),
     updatedAt: milestone.updatedAt.toISOString()
+  };
+}
+
+export function serializeEngagementDeliverableRecord(
+  deliverable: DbEngagementDeliverable
+): EngagementDeliverableRecord {
+  return {
+    id: deliverable.id,
+    engagementId: deliverable.engagementId,
+    title: deliverable.title,
+    summary: deliverable.summary,
+    artifactType: deliverable.artifactType,
+    status: deliverable.status as EngagementDeliverableRecord["status"],
+    createdAt: deliverable.createdAt.toISOString(),
+    updatedAt: deliverable.updatedAt.toISOString()
+  };
+}
+
+export function serializeEngagementReviewRecord(
+  review: DbEngagementReview
+): EngagementReviewRecord {
+  return {
+    id: review.id,
+    engagementId: review.engagementId,
+    verdict: review.verdict as EngagementReviewRecord["verdict"],
+    notes: review.notes,
+    createdAt: review.createdAt.toISOString(),
+    deliverableId: review.deliverableId ?? null
   };
 }
 
@@ -290,6 +322,8 @@ export function serializeEngagementDetail(
     };
     demandResponse: DbDemandResponse & { provider: DbProvider };
     milestones: DbEngagementMilestone[];
+    deliverables: DbEngagementDeliverable[];
+    reviews: DbEngagementReview[];
   }
 ): EngagementDetail {
   return {
@@ -309,7 +343,9 @@ export function serializeEngagementDetail(
     },
     agent: serializeAgentDefinition(engagement.taskRequest.agent),
     demandResponse: serializeDemandResponseRecord(engagement.demandResponse),
-    milestones: engagement.milestones.map(serializeEngagementMilestoneRecord)
+    milestones: engagement.milestones.map(serializeEngagementMilestoneRecord),
+    deliverables: engagement.deliverables.map(serializeEngagementDeliverableRecord),
+    reviews: engagement.reviews.map(serializeEngagementReviewRecord)
   };
 }
 

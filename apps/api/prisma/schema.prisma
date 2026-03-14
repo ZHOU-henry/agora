@@ -102,7 +102,9 @@ model Engagement {
   providerId String
   provider   ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
 
-  milestones EngagementMilestone[]
+  milestones   EngagementMilestone[]
+  deliverables EngagementDeliverable[]
+  reviews      EngagementReview[]
 }
 
 model EngagementMilestone {
@@ -116,6 +118,34 @@ model EngagementMilestone {
 
   engagementId String
   engagement   Engagement @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+}
+
+model EngagementDeliverable {
+  id          String   @id @default(cuid())
+  title       String
+  summary     String
+  artifactType String
+  status      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  engagementId String
+  engagement   Engagement @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+
+  reviews EngagementReview[]
+}
+
+model EngagementReview {
+  id        String   @id @default(cuid())
+  verdict   String
+  notes     String
+  createdAt DateTime @default(now())
+
+  engagementId String
+  engagement   Engagement @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+
+  deliverableId String?
+  deliverable   EngagementDeliverable? @relation(fields: [deliverableId], references: [id], onDelete: SetNull)
 }
 
 model TaskRun {

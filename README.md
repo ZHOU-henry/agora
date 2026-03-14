@@ -119,6 +119,10 @@ pnpm lint
 pnpm typecheck
 pnpm db:export
 pnpm db:import /path/to/dump.sql
+./scripts/build-production.sh
+AGORA_WEB_PORT=3200 AGORA_API_PORT=3201 ./scripts/start-production-stack.sh
+AGORA_WEB_PORT=3200 AGORA_API_PORT=3201 ./scripts/check-production-stack.sh
+./scripts/stop-production-stack.sh
 ```
 
 ## Read-Only Preview Mode
@@ -152,6 +156,7 @@ See:
 
 - `docs/demo/local-preview.md`
 - `docs/demo/public-demo-checklist.md`
+- `docs/hk-production-cutover.md`
 
 ## Local Database
 

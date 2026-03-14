@@ -1,0 +1,17 @@
+[Unit]
+Description=Agora API
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=henry
+WorkingDirectory=/srv/agora/apps/api
+Environment=PORT=3001
+Environment=AGORA_ACCESS_PASSWORD=CHANGE_ME
+ExecStart=/usr/bin/env node dist/index.js
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

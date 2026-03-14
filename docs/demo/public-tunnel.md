@@ -72,3 +72,4 @@ This stops both the public tunnel and the local read-only preview that backs it.
 - use `interactive` mode only for trusted users because writes are live
 - the tunnel points only to the web app, not to PostgreSQL
 - Cloudflare Quick Tunnels are acceptable for temporary demos, not as a durable production ingress
+- the protected public mode now adds `no-store` and `noindex` style headers to reduce indexing and caching risk

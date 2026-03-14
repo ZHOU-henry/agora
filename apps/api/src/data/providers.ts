@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { providerProfiles, type ProviderProfileInput } from "@agora/shared/domain";
 import { prisma } from "../lib/prisma.js";
 import {
@@ -68,7 +69,7 @@ export async function syncProviderProfiles() {
 export async function createProviderProfile(input: ProviderProfileInput) {
   const row = await prisma.providerProfile.create({
     data: {
-      id: crypto.randomUUID(),
+      id: randomUUID(),
       slug: input.slug,
       name: input.name,
       summary: input.summary,

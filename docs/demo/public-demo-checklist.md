@@ -2,7 +2,7 @@
 
 ## Before Exposing Agora Outside The Machine
 
-1. Use `readonly` preview mode.
+1. Default to `readonly` preview mode.
 2. Set a password.
 3. Verify `./scripts/check-preview.sh` returns:
    - `web=ok`
@@ -19,6 +19,12 @@ The safest first remote demo pattern is:
 - read-only preview mode
 - only after that, expose the site through a controlled tunnel or private network route
 
+If you must expose interactive mode:
+
+- use it only with trusted viewers
+- create a DB export backup before startup
+- treat it as a live working environment, not a safe sandbox
+
 Current helper flow:
 
 ```bash
@@ -28,6 +34,5 @@ Current helper flow:
 
 ## What Not To Do
 
-- do not expose the interactive mode publicly
 - do not expose the local database publicly
 - do not assume “no one will click the button” is a security boundary

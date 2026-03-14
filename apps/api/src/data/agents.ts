@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import {
   agentDefinitions,
   type AgentDefinitionInput
@@ -68,7 +69,7 @@ export async function syncAgentDefinitions() {
 export async function createAgentDefinition(input: AgentDefinitionInput) {
   const row = await prisma.agentDefinition.create({
     data: {
-      id: crypto.randomUUID(),
+      id: randomUUID(),
       slug: input.slug,
       name: input.name,
       summary: input.summary,

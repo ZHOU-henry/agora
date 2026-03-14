@@ -28,6 +28,8 @@ export async function POST(request: NextRequest) {
     ok: true,
     redirectTo: getAccessRoleRedirectPath(role)
   });
+  response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   response.cookies.set(COOKIE_NAME, "granted", {
     httpOnly: true,
     sameSite: "strict",
@@ -48,6 +50,8 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE() {
   const response = NextResponse.json({ ok: true });
+  response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   response.cookies.set(COOKIE_NAME, "", {
     httpOnly: true,
     sameSite: "strict",

@@ -7,6 +7,15 @@ import {
 
 const COOKIE_NAME = "agora-preview-access";
 
+function applyProtectedHeaders(response: NextResponse) {
+  response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "same-origin");
+  return response;
+}
+
 export function proxy(request: NextRequest) {
   const password = process.env.AGORA_ACCESS_PASSWORD;
 
@@ -22,7 +31,7 @@ export function proxy(request: NextRequest) {
     pathname.startsWith("/_next") ||
     pathname === "/favicon.ico"
   ) {
-    return NextResponse.next();
+    return applyProtectedHeaders(NextResponse.next());
   }
 
   const hasAccess = request.cookies.get(COOKIE_NAME)?.value === "granted";
@@ -31,17 +40,19 @@ export function proxy(request: NextRequest) {
   if (hasAccess) {
     if (pathname === "/") {
       const dashboardUrl = new URL(getAccessRoleRedirectPath(role), request.url);
-      return NextResponse.redirect(dashboardUrl);
+      return applyProtectedHeaders(NextResponse.redirect(dashboardUrl));
     }
-    return NextResponse.next();
+    return applyProtectedHeaders(NextResponse.next());
   }
 
   if (pathname.startsWith("/api/")) {
-    return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    return applyProtectedHeaders(
+      NextResponse.json({ error: "Authentication required." }, { status: 401 })
+    );
   }
 
   const loginUrl = new URL("/access", request.url);
-  return NextResponse.redirect(loginUrl);
+  return applyProtectedHeaders(NextResponse.redirect(loginUrl));
 }
 
 export const config = {

@@ -10,6 +10,11 @@ import {
   syncAgentDefinitions
 } from "./data/agents.js";
 import {
+  getProviderDetailBySlug,
+  listProviders,
+  syncProviderProfiles
+} from "./data/providers.js";
+import {
   createTaskRequest,
   getTaskRequestById,
   getTaskRunById,
@@ -43,6 +48,25 @@ server.get("/runtime", async () => {
 server.get("/agents", async () => {
   return {
     items: await listAgents()
+  };
+});
+
+server.get("/providers", async () => {
+  return {
+    items: await listProviders()
+  };
+});
+
+server.get("/providers/:slug", async (request, reply) => {
+  const { slug } = request.params as { slug: string };
+  const provider = await getProviderDetailBySlug(slug);
+
+  if (!provider) {
+    return notFound(reply, "Provider not found");
+  }
+
+  return {
+    item: provider
   };
 });
 
@@ -176,6 +200,7 @@ server.post("/task-runs/:id/review", async (request, reply) => {
 const port = Number(process.env.PORT ?? 3001);
 
 async function start() {
+  await syncProviderProfiles();
   await syncAgentDefinitions();
 
   try {

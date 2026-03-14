@@ -42,6 +42,9 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
             <Link href="/" className="actionlink">
               Back to catalog
             </Link>
+            <Link href={`/providers/${agent.provider.slug}`} className="actionlink">
+              Inspect builder
+            </Link>
           </div>
         </div>
 
@@ -69,6 +72,29 @@ export default async function AgentDetailPage({ params }: AgentDetailPageProps) 
       </section>
 
       <div className="surface-grid surface-grid-two">
+        <section className="panel">
+          <div className="sectionhead">
+            <p className="eyebrow">Builder</p>
+            <h2>Supply-side owner</h2>
+          </div>
+          <p className="tagline">
+            {humanizeToken(agent.provider.type)} / {agent.provider.name}
+          </p>
+          <p>{agent.provider.summary}</p>
+          {agent.provider.website ? (
+            <p>
+              <a className="cardlink" href={agent.provider.website}>
+                Visit builder site
+              </a>
+            </p>
+          ) : null}
+          <p>
+            <Link className="cardlink" href={`/providers/${agent.provider.slug}`}>
+              Open builder profile
+            </Link>
+          </p>
+        </section>
+
         <section className="panel">
           <div className="sectionhead">
             <p className="eyebrow">Assurance</p>

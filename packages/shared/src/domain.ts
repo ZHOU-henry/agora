@@ -1,11 +1,30 @@
 import { z } from "zod";
 
 export const AgentStatusSchema = z.enum(["draft", "active"]);
+export const ProviderTypeSchema = z.enum([
+  "first_party",
+  "company",
+  "independent"
+]);
 export const ProvenanceStatusSchema = z.enum([
   "seeded",
   "reviewed_external",
   "mixed"
 ]);
+
+export const ProviderProfileSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  name: z.string(),
+  summary: z.string(),
+  description: z.string(),
+  type: ProviderTypeSchema,
+  website: z.string(),
+  tags: z.array(z.string()),
+  status: AgentStatusSchema
+});
+
+export type ProviderProfile = z.infer<typeof ProviderProfileSchema>;
 
 export const AgentDefinitionSchema = z.object({
   id: z.string(),
@@ -13,6 +32,8 @@ export const AgentDefinitionSchema = z.object({
   name: z.string(),
   summary: z.string(),
   description: z.string(),
+  providerId: z.string(),
+  provider: ProviderProfileSchema,
   provenanceStatus: ProvenanceStatusSchema,
   provenanceSummary: z.string(),
   tags: z.array(z.string()),
@@ -145,7 +166,24 @@ export const TaskRunSummarySchema = TaskRunRecordSchema.extend({
 
 export type TaskRunSummary = z.infer<typeof TaskRunSummarySchema>;
 
+export const ProviderAgentReferenceSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  name: z.string(),
+  summary: z.string(),
+  status: AgentStatusSchema
+});
+
+export type ProviderAgentReference = z.infer<typeof ProviderAgentReferenceSchema>;
+
+export const ProviderProfileDetailSchema = ProviderProfileSchema.extend({
+  agents: z.array(ProviderAgentReferenceSchema)
+});
+
+export type ProviderProfileDetail = z.infer<typeof ProviderProfileDetailSchema>;
+
 export const AgentDefinitionListSchema = z.array(AgentDefinitionSchema);
+export const ProviderProfileListSchema = z.array(ProviderProfileSchema);
 export const TaskRequestDetailListSchema = z.array(TaskRequestDetailSchema);
 export const TaskRunSummaryListSchema = z.array(TaskRunSummarySchema);
 
@@ -156,6 +194,22 @@ export const TaskRunListQuerySchema = z.object({
   sort: z.enum(["newest", "oldest", "review-priority"]).optional()
 });
 
+const henryFirstPartyProvider: ProviderProfile = {
+  id: "henry-first-party",
+  slug: "henry-first-party",
+  name: "Henry First-Party Operators",
+  summary:
+    "The seeded first-party builder cohort behind Agora's initial launch catalog.",
+  description:
+    "This provider profile represents Henry's own operator stack and the first-party agents used to launch Agora before outside builders join the supply side.",
+  type: "first_party",
+  website: "",
+  tags: ["seeded", "launch-cohort", "operators"],
+  status: "active"
+};
+
+export const providerProfiles: ProviderProfile[] = [henryFirstPartyProvider];
+
 export const agentDefinitions: AgentDefinition[] = [
   {
     id: "athena",
@@ -164,6 +218,8 @@ export const agentDefinitions: AgentDefinition[] = [
     summary: "Project-control intelligence focused on scope, sequencing, and execution clarity.",
     description:
       "Athena helps operators choose direction, structure work, and keep an agent program aligned to real milestones rather than narrative drift.",
+    providerId: henryFirstPartyProvider.id,
+    provider: henryFirstPartyProvider,
     provenanceStatus: "seeded",
     provenanceSummary:
       "Seeded by the Agora team from internal role definitions and execution architecture decisions.",
@@ -186,6 +242,8 @@ export const agentDefinitions: AgentDefinition[] = [
     summary: "Research and intelligence agent for source-backed market and technical analysis.",
     description:
       "Hermes helps operators validate market, product, and technical claims using reliable sources and explicit uncertainty notes.",
+    providerId: henryFirstPartyProvider.id,
+    provider: henryFirstPartyProvider,
     provenanceStatus: "seeded",
     provenanceSummary:
       "Seeded by the Agora team from the internal research role and source-discipline operating model.",
@@ -208,6 +266,8 @@ export const agentDefinitions: AgentDefinition[] = [
     summary: "Engineering agent for implementation, scaffolding, and delivery mechanics.",
     description:
       "Hephaestus turns validated plans into working code, repeatable tooling, and maintainable system structure.",
+    providerId: henryFirstPartyProvider.id,
+    provider: henryFirstPartyProvider,
     provenanceStatus: "seeded",
     provenanceSummary:
       "Seeded by the Agora team from the internal engineering role and implementation workflow model.",
@@ -230,6 +290,8 @@ export const agentDefinitions: AgentDefinition[] = [
     summary: "Audit and quality intelligence for review gates, release judgment, and execution risk control.",
     description:
       "Themis helps operators inspect completed work, challenge weak evidence, and keep launches honest before risky work is accepted or reused.",
+    providerId: henryFirstPartyProvider.id,
+    provider: henryFirstPartyProvider,
     provenanceStatus: "seeded",
     provenanceSummary:
       "Seeded by the Agora team from the internal audit role, provenance gate, and review workflow model.",
@@ -249,4 +311,8 @@ export const agentDefinitions: AgentDefinition[] = [
 
 export function findAgentBySlug(slug: string) {
   return agentDefinitions.find((agent) => agent.slug === slug) ?? null;
+}
+
+export function findProviderBySlug(slug: string) {
+  return providerProfiles.find((provider) => provider.slug === slug) ?? null;
 }

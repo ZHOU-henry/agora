@@ -1,7 +1,9 @@
 import { prisma } from "../lib/prisma.js";
 import { syncAgentDefinitions } from "../data/agents.js";
+import { syncProviderProfiles } from "../data/providers.js";
 
 async function seed() {
+  await syncProviderProfiles();
   await syncAgentDefinitions();
 
   await prisma.taskRequest.create({

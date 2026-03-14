@@ -2,6 +2,10 @@ import {
   agentDefinitions,
   AgentDefinitionListSchema,
   AgentDefinitionSchema,
+  findProviderBySlug,
+  providerProfiles,
+  ProviderProfileDetailSchema,
+  ProviderProfileListSchema,
   TaskRequestDetailListSchema,
   TaskRequestDetailSchema,
   TaskRunDetailSchema,
@@ -54,6 +58,50 @@ export async function getAgentDetail(slug: string) {
 
   const parsed = AgentDefinitionSchema.safeParse(payload.item);
   return parsed.success ? parsed.data : findAgentBySlug(slug);
+}
+
+export async function getProviderCatalog() {
+  const payload = (await tryFetchJson("/providers")) as
+    | { items?: unknown[] }
+    | null;
+
+  if (!payload?.items) {
+    return providerProfiles;
+  }
+
+  const parsed = ProviderProfileListSchema.safeParse(payload.items);
+
+  return parsed.success && parsed.data.length > 0 ? parsed.data : providerProfiles;
+}
+
+export async function getProviderDetail(slug: string) {
+  const payload = (await tryFetchJson(`/providers/${slug}`)) as
+    | { item?: unknown }
+    | null;
+
+  if (!payload?.item) {
+    const provider = findProviderBySlug(slug);
+
+    if (!provider) {
+      return null;
+    }
+
+    return {
+      ...provider,
+      agents: agentDefinitions
+        .filter((agent) => agent.providerId === provider.id)
+        .map((agent) => ({
+          id: agent.id,
+          slug: agent.slug,
+          name: agent.name,
+          summary: agent.summary,
+          status: agent.status
+        }))
+    };
+  }
+
+  const parsed = ProviderProfileDetailSchema.safeParse(payload.item);
+  return parsed.success ? parsed.data : null;
 }
 
 export async function getTaskRequests() {

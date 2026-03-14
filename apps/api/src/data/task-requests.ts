@@ -39,7 +39,11 @@ type DbJsonLike =
 export async function listTaskRequests() {
   const rows = await prisma.taskRequest.findMany({
     include: {
-      agent: true,
+      agent: {
+        include: {
+          provider: true
+        }
+      },
       runs: {
         orderBy: {
           createdAt: "desc"
@@ -58,7 +62,11 @@ export async function getTaskRequestById(id: string) {
   const row = await prisma.taskRequest.findUnique({
     where: { id },
     include: {
-      agent: true,
+      agent: {
+        include: {
+          provider: true
+        }
+      },
       runs: {
         orderBy: {
           createdAt: "desc"
@@ -101,7 +109,11 @@ export async function createTaskRequest(input: TaskRequestInput) {
       }
     },
     include: {
-      agent: true,
+      agent: {
+        include: {
+          provider: true
+        }
+      },
       runs: {
         orderBy: {
           createdAt: "desc"
@@ -119,7 +131,11 @@ export async function getTaskRunById(id: string) {
     include: {
       taskRequest: {
         include: {
-          agent: true
+          agent: {
+            include: {
+              provider: true
+            }
+          }
         }
       },
       events: {
@@ -156,7 +172,11 @@ export async function listTaskRuns(rawFilters: unknown = {}) {
     include: {
       taskRequest: {
         include: {
-          agent: true
+          agent: {
+            include: {
+              provider: true
+            }
+          }
         }
       },
       reviewDecision: true
@@ -240,7 +260,11 @@ export async function updateTaskRunStatus(
       include: {
         taskRequest: {
           include: {
-            agent: true
+            agent: {
+              include: {
+                provider: true
+              }
+            }
           }
         },
         events: {
@@ -307,7 +331,11 @@ export async function submitReviewDecision(
       include: {
         taskRequest: {
           include: {
-            agent: true
+            agent: {
+              include: {
+                provider: true
+              }
+            }
           }
         },
         events: {

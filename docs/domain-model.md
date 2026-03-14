@@ -2,6 +2,21 @@
 
 ## Core Entities
 
+### ProviderProfile
+
+Represents a builder or developer-side supply profile.
+
+Fields:
+
+- `id`
+- `slug`
+- `name`
+- `summary`
+- `description`
+- `type`
+- `website`
+- `status`
+
 ### AgentDefinition
 
 Represents a cataloged agent capability.
@@ -13,7 +28,7 @@ Fields:
 - `name`
 - `summary`
 - `status`
-- `ownerType`
+- `providerId`
 
 ### CapabilityTag
 
@@ -100,6 +115,7 @@ Fields:
 
 ## Relationships
 
+- one `ProviderProfile` can have many `AgentDefinition`s
 - one `AgentDefinition` has many `CapabilityTag`s
 - one `TaskRequest` selects one `AgentDefinition`
 - one `TaskRequest` can have many `TaskRun`s
@@ -111,6 +127,7 @@ Fields:
 
 Persisted now:
 
+- `ProviderProfile`
 - `AgentDefinition`
 - `TaskRequest`
 - `TaskRun`

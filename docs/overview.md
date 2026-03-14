@@ -7,6 +7,7 @@ It should start as a narrow, auditable MVP instead of a maximal platform.
 ## Initial Product Shape
 
 - seeded four-agent operator catalog
+- seeded builder profile layer
 - demand intake
 - agent listing
 - simple matching workflow

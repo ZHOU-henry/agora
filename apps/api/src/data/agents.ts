@@ -4,6 +4,9 @@ import { serializeAgentDefinition } from "../lib/serialize.js";
 
 export async function listAgents() {
   const rows = await prisma.agentDefinition.findMany({
+    include: {
+      provider: true
+    },
     orderBy: {
       name: "asc"
     }
@@ -14,7 +17,10 @@ export async function listAgents() {
 
 export async function getAgentBySlug(slug: string) {
   const row = await prisma.agentDefinition.findUnique({
-    where: { slug }
+    where: { slug },
+    include: {
+      provider: true
+    }
   });
 
   return row ? serializeAgentDefinition(row) : null;
@@ -22,7 +28,10 @@ export async function getAgentBySlug(slug: string) {
 
 export async function getAgentById(id: string) {
   const row = await prisma.agentDefinition.findUnique({
-    where: { id }
+    where: { id },
+    include: {
+      provider: true
+    }
   });
 
   return row ? serializeAgentDefinition(row) : null;
@@ -30,10 +39,12 @@ export async function getAgentById(id: string) {
 
 export async function syncAgentDefinitions() {
   for (const agent of agentDefinitions) {
+    const { provider, ...agentData } = agent;
+
     await prisma.agentDefinition.upsert({
       where: { id: agent.id },
-      update: agent,
-      create: agent
+      update: agentData,
+      create: agentData
     });
   }
 }

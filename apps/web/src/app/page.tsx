@@ -1,5 +1,10 @@
 import Link from "next/link";
-import { getAgentCatalog, getTaskRequests, getTaskRuns } from "../lib/api";
+import {
+  getAgentCatalog,
+  getProviderCatalog,
+  getTaskRequests,
+  getTaskRuns
+} from "../lib/api";
 import { getAgentIntelligence } from "../lib/agent-intelligence";
 import { formatTimestamp, humanizeToken, titleizeToken, toneClass } from "../lib/presenters";
 
@@ -15,6 +20,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
   const query = params.q?.trim().toLowerCase() ?? "";
   const focus = params.focus?.trim().toLowerCase() ?? "all";
   const agents = await getAgentCatalog();
+  const providers = await getProviderCatalog();
   const requests = await getTaskRequests();
   const runs = await getTaskRuns();
   const reviewQueue = runs.filter(
@@ -44,6 +50,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
     }
   ];
   const pulse = [
+    { label: "builder profiles", value: String(providers.length).padStart(2, "0") },
     { label: "catalog nodes", value: String(agents.length).padStart(2, "0") },
     { label: "task requests", value: String(requests.length).padStart(2, "0") },
     { label: "active runs", value: String(activeRuns.length).padStart(2, "0") },
@@ -214,6 +221,42 @@ export default async function HomePage({ searchParams }: HomePageProps) {
 
       <section className="panel">
         <div className="sectionhead">
+          <p className="eyebrow">Supply Side</p>
+          <h2>Builder profiles behind the launch cohort</h2>
+          <p className="lede small">
+            Agora starts with seeded first-party supply, but the platform model is built
+            around multiple outside builders publishing specialized agents over time.
+          </p>
+        </div>
+        <div className="grid">
+          {providers.map((provider) => (
+            <article key={provider.id} className="card">
+              <div className="cardtopline">
+                <span className="microeyebrow">builder</span>
+                <span className={`statuspill ${toneClass(provider.status)}`}>
+                  {provider.status}
+                </span>
+              </div>
+              <h3>{provider.name}</h3>
+              <p>{provider.summary}</p>
+              <p className="provenance">Type: {humanizeToken(provider.type)}</p>
+              <div className="chiprow">
+                {provider.tags.map((tag) => (
+                  <span key={tag} className="datachip">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <Link href={`/providers/${provider.slug}`} className="cardlink">
+                Inspect builder profile
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="sectionhead">
           <p className="eyebrow">Agent Catalog</p>
           <h2>Seeded first-party operators with explicit role boundaries</h2>
           <p className="lede small">
@@ -234,6 +277,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
               </div>
               <h3>{agent.name}</h3>
               <p>{agent.summary}</p>
+              <p className="tagline">Built by {agent.provider.name}</p>
               <p className="provenance">Provenance: {humanizeToken(agent.provenanceStatus)}</p>
               <div className="chiprow">
                 {agent.tags.map((tag) => (
@@ -248,6 +292,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
                   <p>{agent.intelligence.idealFor[0]}</p>
                 </div>
               ) : null}
+              <Link href={`/providers/${agent.provider.slug}`} className="cardlink">
+                View builder
+              </Link>
               <Link href={`/agents/${agent.slug}`} className="cardlink">
                 Inspect and submit task
               </Link>

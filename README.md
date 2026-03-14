@@ -28,6 +28,7 @@ Stage 1: executable monorepo with persisted task requests, first run record life
 ## Current Product Slice
 
 - seeded four-agent catalog aligned to Athena, Hermes, Hephaestus, and Themis
+- seeded builder/provider profile layer for the launch cohort
 - agent catalog
 - agent detail
 - task intake

@@ -1,24 +1,80 @@
 import type { Prisma } from "@prisma/client";
 import type {
   AgentDefinition,
+  ProviderAgentReference,
+  ProviderProfile,
+  ProviderProfileDetail,
   TaskRequestDetail,
   TaskRunDetail,
   TaskRunRecord
 } from "@agora/shared/domain";
 
 type DbAgent = Prisma.AgentDefinitionGetPayload<Record<string, never>>;
+type DbProvider = Prisma.ProviderProfileGetPayload<Record<string, never>>;
 type DbTaskRequest = Prisma.TaskRequestGetPayload<Record<string, never>>;
 type DbTaskRun = Prisma.TaskRunGetPayload<Record<string, never>>;
 type DbRunEvent = Prisma.RunEventGetPayload<Record<string, never>>;
 type DbReviewDecision = Prisma.ReviewDecisionGetPayload<Record<string, never>>;
 
-export function serializeAgentDefinition(agent: DbAgent): AgentDefinition {
+export function serializeProviderProfile(provider: DbProvider): ProviderProfile {
+  return {
+    id: provider.id,
+    slug: provider.slug,
+    name: provider.name,
+    summary: provider.summary,
+    description: provider.description,
+    type: provider.type as ProviderProfile["type"],
+    website: provider.website ?? "",
+    tags: provider.tags,
+    status: provider.status as ProviderProfile["status"]
+  };
+}
+
+export function serializeProviderAgentReference(
+  agent: DbAgent
+): ProviderAgentReference {
+  return {
+    id: agent.id,
+    slug: agent.slug,
+    name: agent.name,
+    summary: agent.summary,
+    status: agent.status as ProviderAgentReference["status"]
+  };
+}
+
+export function serializeProviderProfileDetail(
+  provider: DbProvider & { agents: DbAgent[] }
+): ProviderProfileDetail {
+  return {
+    ...serializeProviderProfile(provider),
+    agents: provider.agents.map(serializeProviderAgentReference)
+  };
+}
+
+export function serializeAgentDefinition(
+  agent: DbAgent & { provider: DbProvider | null }
+): AgentDefinition {
   return {
     id: agent.id,
     slug: agent.slug,
     name: agent.name,
     summary: agent.summary,
     description: agent.description,
+    providerId: agent.providerId ?? "",
+    provider: agent.provider
+      ? serializeProviderProfile(agent.provider)
+      : {
+          id: "",
+          slug: "unknown-provider",
+          name: "Unknown provider",
+          summary: "Provider data is unavailable for this agent.",
+          description:
+            "Provider data is unavailable for this agent. Refresh the catalog sync before relying on this record.",
+          type: "company",
+          website: "",
+          tags: [],
+          status: "draft"
+        },
     provenanceStatus: agent.provenanceStatus as AgentDefinition["provenanceStatus"],
     provenanceSummary: agent.provenanceSummary,
     tags: agent.tags,
@@ -47,7 +103,7 @@ export function serializeTaskRunRecord(run: DbTaskRun): TaskRunRecord {
 }
 
 export function serializeTaskRequestDetail(taskRequest: DbTaskRequest & {
-  agent: DbAgent;
+  agent: DbAgent & { provider: DbProvider | null };
   runs: DbTaskRun[];
 }): TaskRequestDetail {
   return {
@@ -65,7 +121,9 @@ export function serializeTaskRequestDetail(taskRequest: DbTaskRequest & {
 }
 
 export function serializeTaskRunDetail(taskRun: DbTaskRun & {
-  taskRequest: DbTaskRequest & { agent: DbAgent };
+  taskRequest: DbTaskRequest & {
+    agent: DbAgent & { provider: DbProvider | null };
+  };
   events: DbRunEvent[];
   reviewDecision: DbReviewDecision | null;
 }): TaskRunDetail {
@@ -107,7 +165,9 @@ export function serializeTaskRunDetail(taskRun: DbTaskRun & {
 }
 
 export function serializeTaskRunSummary(taskRun: DbTaskRun & {
-  taskRequest: DbTaskRequest & { agent: DbAgent };
+  taskRequest: DbTaskRequest & {
+    agent: DbAgent & { provider: DbProvider | null };
+  };
   reviewDecision: DbReviewDecision | null;
 }) {
   return {

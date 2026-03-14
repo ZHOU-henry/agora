@@ -6,20 +6,38 @@ datasource db {
   provider = "postgresql"
 }
 
+model ProviderProfile {
+  id          String   @id
+  slug        String   @unique
+  name        String
+  summary     String
+  description String
+  type        String
+  website     String?
+  tags        String[]
+  status      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  agents AgentDefinition[]
+}
+
 model AgentDefinition {
-  id           String   @id
-  slug         String   @unique
-  name         String
-  summary      String
-  description  String
+  id               String   @id
+  slug             String   @unique
+  name             String
+  summary          String
+  description      String
+  providerId       String?
+  provider         ProviderProfile? @relation(fields: [providerId], references: [id], onDelete: SetNull)
   provenanceStatus String   @default("seeded")
   provenanceSummary String  @default("Seeded internal agent metadata.")
-  tags         String[]
-  constraints  String[]
-  trustSignals String[]
-  status       String
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  tags             String[]
+  constraints      String[]
+  trustSignals     String[]
+  status           String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
   taskRequests TaskRequest[]
 }

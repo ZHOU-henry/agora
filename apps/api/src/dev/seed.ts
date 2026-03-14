@@ -1,10 +1,12 @@
 import { prisma } from "../lib/prisma.js";
 import { syncAgentDefinitions } from "../data/agents.js";
+import { syncSeededMarketplaceData } from "../data/marketplace-seeds.js";
 import { syncProviderProfiles } from "../data/providers.js";
 
 async function seed() {
   await syncProviderProfiles();
   await syncAgentDefinitions();
+  await syncSeededMarketplaceData();
 
   await prisma.taskRequest.create({
     data: {

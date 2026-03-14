@@ -408,6 +408,7 @@ const copyByLocale: Record<Locale, AppCopy> = {
       brandMeta: "Agent 开发、雇佣与交付平台",
       navItems: [
         { href: "/", label: "平台" },
+        { href: "/demand", label: "需求板" },
         { href: "/providers", label: "开发者" },
         { href: "/queue", label: "执行台" }
       ],
@@ -452,7 +453,7 @@ const copyByLocale: Record<Locale, AppCopy> = {
       title: "把客户需求、开发者供给与 Agent 交付放进同一个控制台。",
       lede: "面向中国与全球企业的 Agent 开发、雇佣与交易平台。当前从第一方种子供给起步，但目标是开放给外部 Agent 开发者与公司。",
       primaryAction: "查看执行台",
-      secondaryAction: "查看开发者侧",
+      secondaryAction: "查看需求板",
       heroChips: ["需求流转", "开发者供给", "交付可追踪", "审核在环"],
       pulse: {
         reviewLane: "审核队列",
@@ -924,6 +925,7 @@ const copyByLocale: Record<Locale, AppCopy> = {
       brandMeta: "Agent Development, Hiring, and Delivery Platform",
       navItems: [
         { href: "/", label: "Platform" },
+        { href: "/demand", label: "Demand" },
         { href: "/providers", label: "Builders" },
         { href: "/queue", label: "Queue" }
       ],
@@ -968,7 +970,7 @@ const copyByLocale: Record<Locale, AppCopy> = {
       title: "Put customer demand, builder supply, and agent delivery inside one operating surface.",
       lede: "An agent development, hiring, and transaction platform for Chinese and global enterprises. The current launch starts with first-party supply, but the direction is open to outside builders and agent companies.",
       primaryAction: "Open queue",
-      secondaryAction: "See builders",
+      secondaryAction: "View demand board",
       heroChips: ["demand flow", "builder supply", "traceable delivery", "review in loop"],
       pulse: {
         reviewLane: "review lane",

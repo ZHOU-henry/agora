@@ -95,7 +95,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <Link href="/queue" className="actionlink actionlink-primary">
               {copy.home.primaryAction}
             </Link>
-            <Link href="/providers" className="actionlink">
+            <Link href="/demand" className="actionlink">
               {copy.home.secondaryAction}
             </Link>
           </div>

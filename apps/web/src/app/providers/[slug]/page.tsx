@@ -26,6 +26,24 @@ export default async function ProviderDetailPage({
   }
 
   const localizedProvider = localizeProvider(provider, locale);
+  const responseCopy =
+    locale === "zh"
+      ? {
+          eyebrow: "已响应需求",
+          title: "这个开发者当前承接的需求机会",
+          empty: "这个开发者当前还没有展示中的需求响应。",
+          action: "查看需求",
+          industry: "行业",
+          requester: "客户"
+        }
+      : {
+          eyebrow: "Demand Responses",
+          title: "Current demand opportunities this builder is pursuing",
+          empty: "No visible demand responses for this builder yet.",
+          action: "Inspect demand",
+          industry: "Industry",
+          requester: "Customer"
+        };
 
   return (
     <main className="page">
@@ -130,6 +148,40 @@ export default async function ProviderDetailPage({
               </Link>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="sectionhead">
+          <p className="eyebrow">{responseCopy.eyebrow}</p>
+          <h2>{responseCopy.title}</h2>
+        </div>
+        <div className="timeline">
+          {localizedProvider.responses.length === 0 ? (
+            <p>{responseCopy.empty}</p>
+          ) : (
+            localizedProvider.responses.map((response) => (
+              <article key={response.id} className="timelineitem">
+                <div className="timelinehead">
+                  <p className="tagline">{response.headline}</p>
+                  <span className={`statuspill ${toneClass(response.status)}`}>
+                    {humanizeToken(response.status, locale)}
+                  </span>
+                </div>
+                <p>{response.proposalSummary}</p>
+                <p className="tagline">
+                  {responseCopy.industry} / {response.industry || "-"} / {responseCopy.requester} /{" "}
+                  {response.requesterOrg || "-"}
+                </p>
+                <Link
+                  href={`/requests/${response.taskRequestId}`}
+                  className="cardlink"
+                >
+                  {responseCopy.action}
+                </Link>
+              </article>
+            ))
+          )}
         </div>
       </section>
     </main>

@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BuilderResponseForm } from "../../../components/builder-response-form";
 import { MediaCard } from "../../../components/media-card";
-import { getTaskRequest } from "../../../lib/api";
-import { localizeAgent } from "../../../lib/catalog-copy";
+import { getProviderCatalog, getTaskRequest } from "../../../lib/api";
+import { localizeAgent, localizeProvider } from "../../../lib/catalog-copy";
 import { getCopy } from "../../../lib/copy";
 import { getLocale } from "../../../lib/locale";
 import { formatTimestamp, humanizeToken, toneClass } from "../../../lib/presenters";
@@ -24,6 +25,32 @@ export default async function TaskRequestPage({ params }: TaskRequestPageProps) 
   }
 
   const localizedAgent = localizeAgent(taskRequest.agent, locale);
+  const localizedProviders = (await getProviderCatalog()).map((provider) =>
+    localizeProvider(provider, locale)
+  );
+  const localizedRequest = {
+    ...taskRequest,
+    responses: taskRequest.responses.map((response) => ({
+      ...response,
+      provider: localizeProvider(response.provider, locale)
+    }))
+  };
+  const responseCopy =
+    locale === "zh"
+      ? {
+          eyebrow: "开发者响应",
+          title: "对这条需求给出承接方案",
+          empty: "目前还没有开发者对这条需求做出公开响应。",
+          industry: "行业",
+          requester: "客户"
+        }
+      : {
+          eyebrow: "Builder Responses",
+          title: "How builders are responding to this demand",
+          empty: "No visible builder responses for this demand yet.",
+          industry: "Industry",
+          requester: "Customer"
+        };
 
   return (
     <main className="page">
@@ -158,6 +185,43 @@ export default async function TaskRequestPage({ params }: TaskRequestPageProps) 
           ))}
         </div>
       </section>
+
+      <div className="surface-grid surface-grid-two">
+        <BuilderResponseForm
+          initialRequest={localizedRequest}
+          providers={localizedProviders}
+          locale={locale}
+        />
+
+        <section className="panel">
+          <div className="sectionhead">
+            <p className="eyebrow">{responseCopy.eyebrow}</p>
+            <h2>{responseCopy.title}</h2>
+          </div>
+          <div className="timeline">
+            {localizedRequest.responses.length === 0 ? (
+              <p>{responseCopy.empty}</p>
+            ) : (
+              localizedRequest.responses.map((response) => (
+                <article key={response.id} className="timelineitem">
+                  <div className="timelinehead">
+                    <p className="tagline">{response.provider.name}</p>
+                    <span className={`statuspill ${toneClass(response.status)}`}>
+                      {humanizeToken(response.status, locale)}
+                    </span>
+                  </div>
+                  <p>{response.headline}</p>
+                  <p>{response.proposalSummary}</p>
+                  <p className="tagline">
+                    {responseCopy.industry} / {taskRequest.industry || "-"} /{" "}
+                    {responseCopy.requester} / {taskRequest.requesterOrg || "-"}
+                  </p>
+                </article>
+              ))
+            )}
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import {
+  type DemandResponseInput,
   TaskRunListQuerySchema,
   type ReviewDecisionInput,
   type RunStatusUpdateInput,
@@ -8,11 +9,13 @@ import {
 import { canReviewRun, canTransitionRun } from "../lib/run-state.js";
 import { prisma } from "../lib/prisma.js";
 import {
+  serializeDemandBoardItem,
   serializeTaskRequestDetail,
   serializeTaskRunDetail,
   serializeTaskRunSummary
 } from "../lib/serialize.js";
 import { getAgentById } from "./agents.js";
+import { getProviderById } from "./providers.js";
 
 function normalizeResultPayload(
   payload: RunStatusUpdateInput["resultPayload"] | DbJsonLike
@@ -48,6 +51,14 @@ export async function listTaskRequests() {
         orderBy: {
           createdAt: "desc"
         }
+      },
+      responses: {
+        include: {
+          provider: true
+        },
+        orderBy: {
+          createdAt: "desc"
+        }
       }
     },
     orderBy: {
@@ -68,6 +79,14 @@ export async function getTaskRequestById(id: string) {
         }
       },
       runs: {
+        orderBy: {
+          createdAt: "desc"
+        }
+      },
+      responses: {
+        include: {
+          provider: true
+        },
         orderBy: {
           createdAt: "desc"
         }
@@ -94,6 +113,8 @@ export async function createTaskRequest(input: TaskRequestInput) {
       title: input.title,
       description: input.description,
       contextNote: input.contextNote,
+      requesterOrg: input.requesterOrg,
+      industry: input.industry,
       status: "submitted",
       runs: {
         create: {
@@ -115,6 +136,14 @@ export async function createTaskRequest(input: TaskRequestInput) {
         }
       },
       runs: {
+        orderBy: {
+          createdAt: "desc"
+        }
+      },
+      responses: {
+        include: {
+          provider: true
+        },
         orderBy: {
           createdAt: "desc"
         }
@@ -148,6 +177,24 @@ export async function getTaskRunById(id: string) {
   });
 
   return row ? serializeTaskRunDetail(row) : null;
+}
+
+export async function listDemandBoard() {
+  const rows = await prisma.taskRequest.findMany({
+    include: {
+      agent: {
+        include: {
+          provider: true
+        }
+      },
+      responses: true
+    },
+    orderBy: {
+      createdAt: "desc"
+    }
+  });
+
+  return rows.map(serializeDemandBoardItem);
 }
 
 export async function listTaskRuns(rawFilters: unknown = {}) {
@@ -197,6 +244,84 @@ export async function listTaskRuns(rawFilters: unknown = {}) {
   }
 
   return serialized;
+}
+
+export async function submitDemandResponse(
+  taskRequestId: string,
+  input: DemandResponseInput
+) {
+  const provider = await getProviderById(input.providerId);
+
+  if (!provider) {
+    return {
+      error: "PROVIDER_NOT_FOUND" as const,
+      providerId: input.providerId
+    };
+  }
+
+  const existingRequest = await prisma.taskRequest.findUnique({
+    where: { id: taskRequestId }
+  });
+
+  if (!existingRequest) {
+    return null;
+  }
+
+  const row = await prisma.demandResponse.upsert({
+    where: {
+      providerId_taskRequestId: {
+        providerId: input.providerId,
+        taskRequestId
+      }
+    },
+    update: {
+      headline: input.headline,
+      proposalSummary: input.proposalSummary,
+      deliveryApproach: input.deliveryApproach,
+      etaLabel: input.etaLabel,
+      confidence: input.confidence,
+      status: "submitted"
+    },
+    create: {
+      providerId: input.providerId,
+      taskRequestId,
+      headline: input.headline,
+      proposalSummary: input.proposalSummary,
+      deliveryApproach: input.deliveryApproach,
+      etaLabel: input.etaLabel,
+      confidence: input.confidence,
+      status: "submitted"
+    },
+    include: {
+      provider: true
+    }
+  });
+
+  const detail = await prisma.taskRequest.findUnique({
+    where: { id: taskRequestId },
+    include: {
+      agent: {
+        include: {
+          provider: true
+        }
+      },
+      runs: {
+        orderBy: {
+          createdAt: "desc"
+        }
+      },
+      responses: {
+        include: {
+          provider: true
+        },
+        orderBy: {
+          createdAt: "desc"
+        }
+      }
+    }
+  });
+
+  return detail ? serializeTaskRequestDetail(detail) : row;
 }
 
 export async function updateTaskRunStatus(

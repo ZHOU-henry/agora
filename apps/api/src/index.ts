@@ -1,5 +1,6 @@
 import Fastify from "fastify";
 import {
+  DemandResponseInputSchema,
   ReviewDecisionInputSchema,
   RunStatusUpdateInputSchema,
   TaskRequestInputSchema
@@ -9,7 +10,9 @@ import {
   listAgents,
   syncAgentDefinitions
 } from "./data/agents.js";
+import { syncSeededMarketplaceData } from "./data/marketplace-seeds.js";
 import {
+  getProviderById,
   getProviderDetailBySlug,
   listProviders,
   syncProviderProfiles
@@ -18,8 +21,10 @@ import {
   createTaskRequest,
   getTaskRequestById,
   getTaskRunById,
+  listDemandBoard,
   listTaskRuns,
   listTaskRequests,
+  submitDemandResponse,
   submitReviewDecision,
   updateTaskRunStatus
 } from "./data/task-requests.js";
@@ -89,6 +94,12 @@ server.get("/task-requests", async () => {
   };
 });
 
+server.get("/demand-board", async () => {
+  return {
+    items: await listDemandBoard()
+  };
+});
+
 server.get("/task-requests/:id", async (request, reply) => {
   const { id } = request.params as { id: string };
   const taskRequest = await getTaskRequestById(id);
@@ -121,6 +132,38 @@ server.post("/task-requests", async (request, reply) => {
 
   return reply.code(201).send({
     item: record
+  });
+});
+
+server.post("/task-requests/:id/responses", async (request, reply) => {
+  if (isReadOnlyPreviewMode()) {
+    return conflict(reply, "Preview mode is read-only");
+  }
+
+  const { id } = request.params as { id: string };
+  const parsed = DemandResponseInputSchema.safeParse(request.body);
+
+  if (!parsed.success) {
+    return badRequest(reply, "Invalid demand response", parsed.error.flatten());
+  }
+
+  const provider = await getProviderById(parsed.data.providerId);
+
+  if (!provider) {
+    return badRequest(reply, "Selected provider is not available", {
+      error: "PROVIDER_NOT_FOUND",
+      providerId: parsed.data.providerId
+    });
+  }
+
+  const result = await submitDemandResponse(id, parsed.data);
+
+  if (!result) {
+    return notFound(reply, "Task request not found");
+  }
+
+  return reply.code(201).send({
+    item: result
   });
 });
 
@@ -202,6 +245,7 @@ const port = Number(process.env.PORT ?? 3001);
 async function start() {
   await syncProviderProfiles();
   await syncAgentDefinitions();
+  await syncSeededMarketplaceData();
 
   try {
     await server.listen({ port, host: "0.0.0.0" });

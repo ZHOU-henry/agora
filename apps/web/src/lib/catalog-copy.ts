@@ -33,6 +33,24 @@ const providerZh: Record<
     summary: "Agora 启动阶段的第一方开发者供给，用于验证平台供给侧与交付链路。",
     description:
       "这个开发者档案代表 Henry 自己的 Agent 能力与第一方供给，用于把 Agora 从概念推进到可以被客户和开发者同时理解的平台。"
+  },
+  "lingxi-factory-ai": {
+    name: "灵析工厂智能",
+    summary: "专注制造排产、工厂指挥和产线决策支持的工业 Agent 开发者。",
+    description:
+      "灵析工厂智能代表一种面向制造企业的开发者侧团队，把生产节奏、异常处理和班组协同封装为垂直 Agent 产品。"
+  },
+  "praxis-quality-lab": {
+    name: "Praxis 质检实验室",
+    summary: "聚焦工业视觉质检、追溯与缺陷复核工作流的 Builder 档案。",
+    description:
+      "Praxis 质检实验室代表把工业质检经验产品化的供给侧团队，目标是让工厂的图像检验与问题回传具备更好的速度和闭环。"
+  },
+  "relay-field-systems": {
+    name: "Relay 现场系统",
+    summary: "聚焦仓储、运维与一线流程增效的开发者侧团队。",
+    description:
+      "Relay 现场系统代表能够把仓储调度、现场维修和一线知识辅助做成 Agent 产品的实战型 Builder。"
   }
 };
 
@@ -90,6 +108,46 @@ const agentZh: Record<
       "由 Agora 团队根据内部审计角色、来源治理与审核工作流模型进行种子化整理。",
     constraints: ["适合审核、质检与交付风险判断", "不适合作为新方向探索或原始实现的第一负责人"],
     trustSignals: ["审核门显式存在", "建设性对抗姿态", "高度关注质量、风险与来源"]
+  },
+  "line-orchestrator": {
+    name: "产线指挥官",
+    summary: "面向生产节奏、排产冲突和异常协同的工厂 Agent 产品。",
+    description:
+      "产线指挥官帮助制造团队解释实时异常、推演计划影响，并在班次切换和现场指挥阶段形成更结构化的决策建议。",
+    provenanceSummary:
+      "种子化演示 Agent，用于模拟外部工业开发者在 Agora 平台上发布的垂直场景产品。",
+    constraints: ["适合已有产线上下文的工厂场景", "不能替代真实控制系统和自动化 PLC 层"],
+    trustSignals: ["强制造场景贴合", "面向运营人员的解释层", "围绕异常处理而不是通用聊天"]
+  },
+  "quality-sentinel": {
+    name: "质检哨兵",
+    summary: "面向缺陷分流、复核说明和问题升级的质检 Agent 产品。",
+    description:
+      "质检哨兵把工业视觉质检场景封装成更可交付的 Agent 工作流，帮助团队更快做缺陷归类、原因说明和升级判断。",
+    provenanceSummary:
+      "种子化演示 Agent，用于表示第三方工业质检 Builder 在平台上的供给能力。",
+    constraints: ["适合已有图像或缺陷输入的场景", "在高监管行业中不能替代最终人工签核"],
+    trustSignals: ["以检验流程为中心设计", "输出适合升级流转", "服务于追溯敏感团队"]
+  },
+  "warehouse-wave-planner": {
+    name: "仓储波次规划官",
+    summary: "面向波峰调度、库位压力与现场派工的仓储 Agent 产品。",
+    description:
+      "仓储波次规划官帮助物流团队理解吞吐波动、库位张力和短周期调度选择，让调度建议对现场主管更可解释。",
+    provenanceSummary:
+      "种子化演示 Agent，用于表示仓储运营方向的外部 Builder 在平台上的产品供给。",
+    constraints: ["适合已有订单与仓内上下文的运营场景", "不能替代 WMS/TMS 等核心执行系统"],
+    trustSignals: ["吞吐压力感知", "面向一线主管", "专注短周期运营决策"]
+  },
+  "maintenance-copilot": {
+    name: "运维副驾",
+    summary: "面向现场诊断、知识调取和工单闭环的维护 Agent 产品。",
+    description:
+      "运维副驾帮助一线团队更快调出相关知识、结构化诊断信息，并提高工单闭环记录的质量与速度。",
+    provenanceSummary:
+      "种子化演示 Agent，用于表示现场服务与运维 Builder 在平台上的产品供给。",
+    constraints: ["适合已有设备上下文的维护场景", "高风险作业不能替代正式工程审批"],
+    trustSignals: ["面向一线工作流", "帮助闭环记录", "围绕知识调取与记录质量设计"]
   }
 };
 

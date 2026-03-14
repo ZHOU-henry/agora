@@ -2,6 +2,7 @@ import {
   agentDefinitions,
   AgentDefinitionListSchema,
   AgentDefinitionSchema,
+  DemandBoardListSchema,
   findProviderBySlug,
   providerProfiles,
   ProviderProfileDetailSchema,
@@ -96,7 +97,8 @@ export async function getProviderDetail(slug: string) {
           name: agent.name,
           summary: agent.summary,
           status: agent.status
-        }))
+        })),
+      responses: []
     };
   }
 
@@ -114,6 +116,19 @@ export async function getTaskRequests() {
   }
 
   const parsed = TaskRequestDetailListSchema.safeParse(payload.items);
+  return parsed.success ? parsed.data : [];
+}
+
+export async function getDemandBoard() {
+  const payload = (await tryFetchJson("/demand-board")) as
+    | { items?: unknown[] }
+    | null;
+
+  if (!payload?.items) {
+    return [];
+  }
+
+  const parsed = DemandBoardListSchema.safeParse(payload.items);
   return parsed.success ? parsed.data : [];
 }
 

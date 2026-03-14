@@ -23,6 +23,14 @@ export async function getProviderBySlug(slug: string) {
   return row ? serializeProviderProfile(row) : null;
 }
 
+export async function getProviderById(id: string) {
+  const row = await prisma.providerProfile.findUnique({
+    where: { id }
+  });
+
+  return row ? serializeProviderProfile(row) : null;
+}
+
 export async function getProviderDetailBySlug(slug: string) {
   const row = await prisma.providerProfile.findUnique({
     where: { slug },
@@ -30,6 +38,15 @@ export async function getProviderDetailBySlug(slug: string) {
       agents: {
         orderBy: {
           name: "asc"
+        }
+      },
+      responses: {
+        include: {
+          provider: true,
+          taskRequest: true
+        },
+        orderBy: {
+          createdAt: "desc"
         }
       }
     }

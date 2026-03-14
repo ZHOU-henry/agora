@@ -4,6 +4,20 @@ Open-source MVP for an AI Agent platform and operator workspace.
 
 Chinese shorthand: `AI Agent 平台`
 
+## Visual Preview
+
+![Agora Control Theater](apps/web/public/media/control-theater-loop.svg)
+
+Agora is being shaped as a customer-demand + builder-supply platform, not just a static agent catalog.
+
+![Builder Network](apps/web/public/media/builder-network-loop.svg)
+
+The launch cohort starts with seeded first-party supply, but the long-term platform shape is open to outside agent developers and companies.
+
+![Demand Board](apps/web/public/media/execution-reel-loop.svg)
+
+The newest product slice adds a seeded demand board and builder response layer, so the platform starts to behave like a market instead of a one-way showcase.
+
 ## Stage
 
 Stage 1: executable monorepo with persisted task requests, first run record lifecycle, and operator review foundations.
@@ -29,6 +43,9 @@ Stage 1: executable monorepo with persisted task requests, first run record life
 
 - seeded four-agent catalog aligned to Athena, Hermes, Hephaestus, and Themis
 - seeded builder/provider profile layer for the launch cohort
+- seeded demand board and builder response layer
+- bilingual Chinese / English product experience
+- industry showcase visuals for manufacturing, quality, warehouse, and maintenance scenarios
 - agent catalog
 - agent detail
 - task intake
@@ -39,6 +56,31 @@ Stage 1: executable monorepo with persisted task requests, first run record life
 - provenance visibility for seeded agents
 - result payload display
 - queue filters for review state and status
+
+## Newest Direction
+
+- `Demand Board`: customer demand is visible to the builder side instead of staying trapped inside one catalog route
+- `Builder Responses`: providers can respond to concrete demand with an offer, approach, and timeline
+- `Bilingual UX`: Chinese is now the default public-facing experience, with English preserved for parity
+- `Industry-first Visuals`: the GitHub and web surfaces now share the same scene language across manufacturing, quality, warehouse, and maintenance workflows
+
+## Product Scenes
+
+### Smart Manufacturing
+
+![Factory Command](apps/web/public/media/factory-command-loop.svg)
+
+### Industrial Quality
+
+![Quality Vision](apps/web/public/media/quality-vision-loop.svg)
+
+### Warehouse Operations
+
+![Warehouse Orchestration](apps/web/public/media/warehouse-orchestration-loop.svg)
+
+### Field Maintenance
+
+![Maintenance Copilot](apps/web/public/media/maintenance-copilot-loop.svg)
 
 ## Commands
 

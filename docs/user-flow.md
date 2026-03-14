@@ -2,11 +2,13 @@
 
 ## Core Loop
 
-1. discover an agent
-2. inspect its profile and fit
-3. submit a task
-4. observe the run
-5. review the outcome
+1. publish a customer demand
+2. expose it to the builder side
+3. collect and compare builder responses
+4. accept one response into a formal engagement
+5. run delivery through engagement, run, and deliverable control
+6. collect customer confirmation, field feedback, and incidents on the same engagement
+7. decide whether to stabilize, remediate, or expand the deployment
 
 ## Phase-1 Product Surfaces
 
@@ -17,12 +19,32 @@
 - tags
 - trust indicators
 
-### Agent Detail
+### Demand Publish
 
-- what the agent is for
-- constraints
-- example tasks
-- expected outputs
+- customer name
+- industry context
+- demand title
+- demand description
+- recommended agent direction
+
+### Builder Response
+
+- provider identity
+- proposal summary
+- delivery approach
+- ETA and confidence
+
+### Engagement
+
+- accepted response
+- engagement status
+- delivery milestones
+- deliverables and review
+- lightweight commercial frame
+- customer confirmation
+- feedback threads
+- incident tickets
+- delivery-health signals
 
 ### Task Intake
 
@@ -58,9 +80,21 @@
 
 - catalog list: implemented
 - agent detail: implemented
-- task intake: implemented
+- demand publish: implemented on the demand board
+- builder response submit: implemented
+- response shortlist / accept / decline: implemented
+- accepted response -> engagement sync: implemented
+- engagement milestone / deliverable / agreement editing: implemented as a first operations workspace
+- customer confirmation: implemented
+- engagement feedback: implemented
+- engagement incidents: implemented
+- accepted response -> delivery run creation: implemented
+- role-surface operating signals: implemented
 - run detail: implemented
 - operator review: implemented as a first minimal verdict flow
 - operator queue: implemented
+- customer response activity view: implemented
+- builder active engagement view: implemented
+- ops response decision queue: implemented
 - provenance display: implemented as a first seeded-source visibility layer
 - result payload: implemented as a first structured execution output

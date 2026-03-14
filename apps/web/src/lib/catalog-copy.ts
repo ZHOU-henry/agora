@@ -172,6 +172,15 @@ export function localizeProvider<T extends ProviderProfile | ProviderProfileDeta
           agents: provider.agents.map((agent) => localizeAgentReference(agent, locale))
         }
       : {})
+    ,
+    ...("engagements" in provider
+      ? {
+          engagements: provider.engagements.map((engagement) => ({
+            ...engagement,
+            agent: localizeAgentReference(engagement.agent, locale)
+          }))
+        }
+      : {})
   };
 }
 

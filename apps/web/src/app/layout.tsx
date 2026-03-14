@@ -4,6 +4,7 @@ import { getLocale } from "../lib/locale";
 import { PreviewNotice } from "../components/preview-notice";
 import { SiteHeader } from "../components/site-header";
 import { isReadOnlyPreviewMode } from "../lib/runtime";
+import { getAccessRole, getAccessRoleNavItems } from "../lib/access-role";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,6 +21,10 @@ export default async function RootLayout({
   const readOnlyPreview = isReadOnlyPreviewMode();
   const accessProtected = Boolean(process.env.AGORA_ACCESS_PASSWORD);
   const copy = getCopy(locale);
+  const accessRole = accessProtected ? await getAccessRole() : "customer";
+  const navItems = accessProtected
+    ? getAccessRoleNavItems(accessRole, locale)
+    : copy.header.navItems;
 
   const modeReadOnly =
     accessProtected && locale === "zh"
@@ -61,12 +66,15 @@ export default async function RootLayout({
               readOnlyPreview={readOnlyPreview}
               locale={locale}
               brandMeta={copy.header.brandMeta}
-              navItems={copy.header.navItems}
+              navItems={navItems}
               modeReadOnly={modeReadOnly}
               modeInteractive={modeInteractive}
               localeLabel={copy.header.localeLabel}
               localeOptions={copy.header.localeOptions}
               accessProtected={accessProtected}
+              currentRole={accessRole}
+              roleLabel={copy.accessGate.roleLabel}
+              roleOptions={copy.accessGate.roleOptions}
             />
             <PreviewNotice
               readOnlyPreview={readOnlyPreview}

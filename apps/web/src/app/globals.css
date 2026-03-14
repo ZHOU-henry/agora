@@ -42,6 +42,18 @@ a {
   color: inherit;
 }
 
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .appshell {
   position: relative;
   min-height: 100vh;
@@ -192,6 +204,16 @@ a {
   gap: 14px;
 }
 
+.header-controls select {
+  min-height: 38px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(125, 180, 255, 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--ink);
+  font: inherit;
+}
+
 .locale-switcher {
   display: grid;
   gap: 6px;
@@ -336,6 +358,12 @@ a {
     var(--bg-panel);
   box-shadow: var(--shadow);
   backdrop-filter: blur(22px);
+}
+
+.panel-subtle {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 48%),
+    rgba(8, 16, 24, 0.72);
 }
 
 .hero-copy {

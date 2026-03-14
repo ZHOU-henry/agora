@@ -16,6 +16,7 @@ import {
   serializeTaskRunSummary
 } from "../lib/serialize.js";
 import { getAgentById } from "./agents.js";
+import { ensureEngagementScaffold } from "./engagement-scaffold.js";
 import { getProviderById } from "./providers.js";
 
 function normalizeResultPayload(
@@ -126,19 +127,7 @@ export async function createTaskRequest(input: TaskRequestInput) {
       contextNote: input.contextNote,
       requesterOrg: input.requesterOrg,
       industry: input.industry,
-      status: "submitted",
-      runs: {
-        create: {
-          status: "submitted",
-          latestMessage: "Task request submitted and initial run created.",
-          events: {
-            create: {
-              eventType: "submitted",
-              message: "Task request submitted."
-            }
-          }
-        }
-      }
+      status: "submitted"
     },
     include: {
       agent: {
@@ -349,80 +338,140 @@ export async function updateDemandResponseStatus(
   id: string,
   input: DemandResponseStatusUpdateInput
 ) {
-  const existing = await prisma.demandResponse.findUnique({
-    where: { id }
-  });
+  return prisma.$transaction(async (tx) => {
+    const existing = await tx.demandResponse.findUnique({
+      where: { id }
+    });
 
-  if (!existing) {
-    return null;
-  }
-
-  await prisma.demandResponse.update({
-    where: { id },
-    data: {
-      status: input.status
+    if (!existing) {
+      return null;
     }
-  });
 
-  if (input.status === "accepted") {
-    await prisma.engagement.upsert({
-      where: {
-        taskRequestId: existing.taskRequestId
-      },
-      update: {
-        providerId: existing.providerId,
-        demandResponseId: existing.id,
-        status: "kickoff",
-        title: existing.headline,
-        summary: existing.proposalSummary
-      },
-      create: {
-        taskRequestId: existing.taskRequestId,
-        providerId: existing.providerId,
-        demandResponseId: existing.id,
-        status: "kickoff",
-        title: existing.headline,
-        summary: existing.proposalSummary
-      }
-    });
-  } else {
-    await prisma.engagement.deleteMany({
-      where: {
-        demandResponseId: existing.id
-      }
-    });
-  }
-
-  const detail = await prisma.taskRequest.findUnique({
-    where: { id: existing.taskRequestId },
-    include: {
-      agent: {
-        include: {
-          provider: true
-        }
-      },
-      runs: {
-        orderBy: {
-          createdAt: "desc"
-        }
-      },
-      responses: {
-        include: {
-          provider: true
+    if (input.status === "accepted") {
+      await tx.demandResponse.updateMany({
+        where: {
+          taskRequestId: existing.taskRequestId,
+          id: {
+            not: id
+          }
         },
-        orderBy: {
-          createdAt: "desc"
+        data: {
+          status: "declined"
         }
-      },
-      engagement: {
-        include: {
-          provider: true
+      });
+    }
+
+    await tx.demandResponse.update({
+      where: { id },
+      data: {
+        status: input.status
+      }
+    });
+
+    if (input.status === "accepted") {
+      const engagement = await tx.engagement.upsert({
+        where: {
+          taskRequestId: existing.taskRequestId
+        },
+        update: {
+          providerId: existing.providerId,
+          demandResponseId: existing.id,
+          status: "kickoff",
+          title: existing.headline,
+          summary: existing.proposalSummary
+        },
+        create: {
+          taskRequestId: existing.taskRequestId,
+          providerId: existing.providerId,
+          demandResponseId: existing.id,
+          status: "kickoff",
+          title: existing.headline,
+          summary: existing.proposalSummary
+        }
+      });
+
+      await ensureEngagementScaffold(tx, {
+        engagementId: engagement.id,
+        taskRequestId: existing.taskRequestId
+      });
+
+      const existingRun = await tx.taskRun.findFirst({
+        where: {
+          taskRequestId: existing.taskRequestId
+        }
+      });
+
+      if (!existingRun) {
+        await tx.taskRun.create({
+          data: {
+            taskRequestId: existing.taskRequestId,
+            status: "submitted",
+            latestMessage:
+              "Accepted response converted into a formal delivery run.",
+            events: {
+              create: {
+                eventType: "submitted",
+                message:
+                  "Delivery run created after the platform accepted a builder response."
+              }
+            }
+          }
+        });
+      }
+    } else if (existing.status === "accepted") {
+      await tx.engagement.deleteMany({
+        where: {
+          demandResponseId: existing.id
+        }
+      });
+
+      await tx.taskRun.deleteMany({
+        where: {
+          taskRequestId: existing.taskRequestId
+        }
+      });
+
+      await tx.taskRequest.update({
+        where: {
+          id: existing.taskRequestId
+        },
+        data: {
+          status: "submitted"
+        }
+      });
+    }
+
+    const detail = await tx.taskRequest.findUnique({
+      where: { id: existing.taskRequestId },
+      include: {
+        agent: {
+          include: {
+            provider: true
+          }
+        },
+        runs: {
+          orderBy: {
+            createdAt: "desc"
+          }
+        },
+        responses: {
+          include: {
+            provider: true
+          },
+          orderBy: {
+            createdAt: "desc"
+          }
+        },
+        engagement: {
+          include: {
+            provider: true
+          }
         }
       }
-    }
-  });
+    });
 
-  return detail ? serializeTaskRequestDetail(detail) : null;
+    return detail ? serializeTaskRequestDetail(detail) : null;
+  });
 }
 
 export async function updateTaskRunStatus(

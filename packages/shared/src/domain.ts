@@ -125,6 +125,41 @@ export const EngagementAgreementStatusSchema = z.enum([
   "confirmed"
 ]);
 
+export const CustomerConfirmationStatusSchema = z.enum([
+  "pending",
+  "accepted",
+  "issues_reported",
+  "expansion_requested"
+]);
+
+export const EngagementFeedbackCategorySchema = z.enum([
+  "field_feedback",
+  "environment_change",
+  "maintenance_request",
+  "expansion_signal"
+]);
+
+export const EngagementFeedbackStatusSchema = z.enum([
+  "submitted",
+  "acknowledged",
+  "planned",
+  "resolved"
+]);
+
+export const EngagementIncidentSeveritySchema = z.enum([
+  "low",
+  "medium",
+  "high",
+  "critical"
+]);
+
+export const EngagementIncidentStatusSchema = z.enum([
+  "open",
+  "investigating",
+  "mitigated",
+  "resolved"
+]);
+
 export const TaskRequestInputSchema = z.object({
   agentId: z.string().min(1),
   title: z.string().min(3).max(120),
@@ -135,6 +170,15 @@ export const TaskRequestInputSchema = z.object({
 });
 
 export type TaskRequestInput = z.infer<typeof TaskRequestInputSchema>;
+
+export const DemandBoardPublishInputSchema = TaskRequestInputSchema.extend({
+  requesterOrg: z.string().min(2).max(160),
+  industry: z.string().min(2).max(120)
+});
+
+export type DemandBoardPublishInput = z.infer<
+  typeof DemandBoardPublishInputSchema
+>;
 
 export const TaskRequestRecordSchema = TaskRequestInputSchema.extend({
   id: z.string(),
@@ -183,6 +227,12 @@ export const EngagementRecordSchema = z.object({
   status: EngagementStatusSchema,
   title: z.string(),
   summary: z.string(),
+  taskRunCount: z.number(),
+  feedbackCount: z.number(),
+  unresolvedFeedbackCount: z.number(),
+  incidentCount: z.number(),
+  openIncidentCount: z.number(),
+  customerConfirmationStatus: CustomerConfirmationStatusSchema.nullable(),
   createdAt: z.string(),
   updatedAt: z.string()
 });
@@ -212,6 +262,17 @@ export type EngagementStatusUpdateInput = z.infer<
   typeof EngagementStatusUpdateInputSchema
 >;
 
+export const EngagementMilestoneInputSchema = z.object({
+  title: z.string().min(3).max(120),
+  summary: z.string().min(10).max(600),
+  dueLabel: z.string().max(120).optional().default(""),
+  status: EngagementMilestoneStatusSchema.optional().default("planned")
+});
+
+export type EngagementMilestoneInput = z.infer<
+  typeof EngagementMilestoneInputSchema
+>;
+
 export const EngagementDeliverableRecordSchema = z.object({
   id: z.string(),
   engagementId: z.string(),
@@ -233,6 +294,17 @@ export const EngagementDeliverableStatusUpdateInputSchema = z.object({
 
 export type EngagementDeliverableStatusUpdateInput = z.infer<
   typeof EngagementDeliverableStatusUpdateInputSchema
+>;
+
+export const EngagementDeliverableInputSchema = z.object({
+  title: z.string().min(3).max(120),
+  summary: z.string().min(10).max(600),
+  artifactType: z.string().min(2).max(80),
+  status: EngagementDeliverableStatusSchema.optional().default("planned")
+});
+
+export type EngagementDeliverableInput = z.infer<
+  typeof EngagementDeliverableInputSchema
 >;
 
 export const EngagementReviewRecordSchema = z.object({
@@ -263,6 +335,119 @@ export const EngagementAgreementRecordSchema = z.object({
 
 export type EngagementAgreementRecord = z.infer<
   typeof EngagementAgreementRecordSchema
+>;
+
+export const EngagementAgreementInputSchema = z.object({
+  status: EngagementAgreementStatusSchema,
+  engagementMode: z.string().min(2).max(120),
+  billingModel: z.string().min(2).max(120),
+  budgetLabel: z.string().min(2).max(120),
+  startWindow: z.string().min(2).max(120),
+  notes: z.string().min(3).max(1000)
+});
+
+export type EngagementAgreementInput = z.infer<
+  typeof EngagementAgreementInputSchema
+>;
+
+export const CustomerConfirmationRecordSchema = z.object({
+  id: z.string(),
+  engagementId: z.string(),
+  status: CustomerConfirmationStatusSchema,
+  summary: z.string(),
+  notes: z.string(),
+  nextStep: z.string().nullable().optional(),
+  confirmedAt: z.string().nullable().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string()
+});
+
+export type CustomerConfirmationRecord = z.infer<
+  typeof CustomerConfirmationRecordSchema
+>;
+
+export const CustomerConfirmationInputSchema = z.object({
+  status: CustomerConfirmationStatusSchema,
+  summary: z.string().min(3).max(240),
+  notes: z.string().min(3).max(1000),
+  nextStep: z.string().max(240).optional().default("")
+});
+
+export type CustomerConfirmationInput = z.infer<
+  typeof CustomerConfirmationInputSchema
+>;
+
+export const EngagementFeedbackRecordSchema = z.object({
+  id: z.string(),
+  engagementId: z.string(),
+  title: z.string(),
+  details: z.string(),
+  category: EngagementFeedbackCategorySchema,
+  status: EngagementFeedbackStatusSchema,
+  authorRole: z.string(),
+  responseNote: z.string().nullable().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string()
+});
+
+export type EngagementFeedbackRecord = z.infer<
+  typeof EngagementFeedbackRecordSchema
+>;
+
+export const EngagementFeedbackInputSchema = z.object({
+  title: z.string().min(3).max(120),
+  details: z.string().min(10).max(1200),
+  category: EngagementFeedbackCategorySchema
+});
+
+export type EngagementFeedbackInput = z.infer<
+  typeof EngagementFeedbackInputSchema
+>;
+
+export const EngagementFeedbackStatusUpdateInputSchema = z.object({
+  status: EngagementFeedbackStatusSchema,
+  responseNote: z.string().max(1000).optional().default("")
+});
+
+export type EngagementFeedbackStatusUpdateInput = z.infer<
+  typeof EngagementFeedbackStatusUpdateInputSchema
+>;
+
+export const EngagementIncidentRecordSchema = z.object({
+  id: z.string(),
+  engagementId: z.string(),
+  title: z.string(),
+  summary: z.string(),
+  severity: EngagementIncidentSeveritySchema,
+  status: EngagementIncidentStatusSchema,
+  authorRole: z.string(),
+  responseNote: z.string().nullable().optional(),
+  openedAt: z.string(),
+  resolvedAt: z.string().nullable().optional(),
+  updatedAt: z.string()
+});
+
+export type EngagementIncidentRecord = z.infer<
+  typeof EngagementIncidentRecordSchema
+>;
+
+export const EngagementIncidentInputSchema = z.object({
+  title: z.string().min(3).max(120),
+  summary: z.string().min(10).max(1200),
+  severity: EngagementIncidentSeveritySchema
+});
+
+export type EngagementIncidentInput = z.infer<
+  typeof EngagementIncidentInputSchema
+>;
+
+export const EngagementIncidentStatusUpdateInputSchema = z.object({
+  status: EngagementIncidentStatusSchema,
+  responseNote: z.string().max(1000).optional().default("")
+});
+
+export type EngagementIncidentStatusUpdateInput = z.infer<
+  typeof EngagementIncidentStatusUpdateInputSchema
 >;
 
 export const EngagementReviewInputSchema = z.object({
@@ -393,9 +578,21 @@ export type ProviderResponseReference = z.infer<
   typeof ProviderResponseReferenceSchema
 >;
 
+export const ProviderEngagementReferenceSchema = EngagementRecordSchema.extend({
+  agent: ProviderAgentReferenceSchema,
+  taskRequestTitle: z.string(),
+  industry: z.string(),
+  requesterOrg: z.string()
+});
+
+export type ProviderEngagementReference = z.infer<
+  typeof ProviderEngagementReferenceSchema
+>;
+
 export const ProviderProfileDetailSchema = ProviderProfileSchema.extend({
   agents: z.array(ProviderAgentReferenceSchema),
-  responses: z.array(ProviderResponseReferenceSchema)
+  responses: z.array(ProviderResponseReferenceSchema),
+  engagements: z.array(ProviderEngagementReferenceSchema)
 });
 
 export type ProviderProfileDetail = z.infer<typeof ProviderProfileDetailSchema>;
@@ -404,10 +601,14 @@ export const EngagementDetailSchema = EngagementRecordSchema.extend({
   taskRequest: TaskRequestRecordSchema,
   agent: AgentDefinitionSchema,
   demandResponse: DemandResponseRecordSchema,
+  taskRuns: z.array(TaskRunRecordSchema),
   milestones: z.array(EngagementMilestoneRecordSchema),
   deliverables: z.array(EngagementDeliverableRecordSchema),
   reviews: z.array(EngagementReviewRecordSchema),
-  agreement: EngagementAgreementRecordSchema.nullable()
+  agreement: EngagementAgreementRecordSchema.nullable(),
+  customerConfirmation: CustomerConfirmationRecordSchema.nullable(),
+  feedbackItems: z.array(EngagementFeedbackRecordSchema),
+  incidents: z.array(EngagementIncidentRecordSchema)
 });
 
 export type EngagementDetail = z.infer<typeof EngagementDetailSchema>;

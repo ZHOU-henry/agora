@@ -106,6 +106,9 @@ model Engagement {
   deliverables EngagementDeliverable[]
   reviews      EngagementReview[]
   agreement    EngagementAgreement?
+  customerConfirmation EngagementCustomerConfirmation?
+  feedbackItems        EngagementFeedback[]
+  incidents            EngagementIncident[]
 }
 
 model EngagementMilestone {
@@ -161,6 +164,51 @@ model EngagementAgreement {
   updatedAt     DateTime @updatedAt
 
   engagementId String @unique
+  engagement   Engagement @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+}
+
+model EngagementCustomerConfirmation {
+  id          String   @id @default(cuid())
+  status      String
+  summary     String
+  notes       String
+  nextStep    String?
+  confirmedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  engagementId String @unique
+  engagement   Engagement @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+}
+
+model EngagementFeedback {
+  id         String   @id @default(cuid())
+  title      String
+  details    String
+  category   String
+  status     String
+  authorRole String
+  responseNote String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  engagementId String
+  engagement   Engagement @relation(fields: [engagementId], references: [id], onDelete: Cascade)
+}
+
+model EngagementIncident {
+  id           String   @id @default(cuid())
+  title        String
+  summary      String
+  severity     String
+  status       String
+  authorRole   String
+  responseNote String?
+  openedAt     DateTime @default(now())
+  resolvedAt   DateTime?
+  updatedAt    DateTime @updatedAt
+
+  engagementId String
   engagement   Engagement @relation(fields: [engagementId], references: [id], onDelete: Cascade)
 }
 

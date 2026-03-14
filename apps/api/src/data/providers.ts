@@ -41,6 +41,23 @@ export async function getProviderDetailBySlug(slug: string) {
           name: "asc"
         }
       },
+      engagements: {
+        include: {
+          provider: true,
+          customerConfirmation: true,
+          feedbackItems: true,
+          incidents: true,
+          taskRequest: {
+            include: {
+              agent: true,
+              runs: true
+            }
+          }
+        },
+        orderBy: {
+          createdAt: "desc"
+        }
+      },
       responses: {
         include: {
           provider: true,

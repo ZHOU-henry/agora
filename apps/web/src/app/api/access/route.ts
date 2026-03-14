@@ -7,6 +7,26 @@ import {
 
 const COOKIE_NAME = "agora-preview-access";
 
+function applyAccessCookies(response: NextResponse, role: string, secure: boolean) {
+  response.headers.set("Cache-Control", "private, no-store, max-age=0");
+  response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  response.cookies.set(COOKIE_NAME, "granted", {
+    httpOnly: true,
+    sameSite: "strict",
+    secure,
+    path: "/",
+    maxAge: 60 * 60 * 8
+  });
+  response.cookies.set(accessRoleCookieName, role, {
+    httpOnly: true,
+    sameSite: "strict",
+    secure,
+    path: "/",
+    maxAge: 60 * 60 * 8
+  });
+  return response;
+}
+
 export async function POST(request: NextRequest) {
   const password = process.env.AGORA_ACCESS_PASSWORD;
 
@@ -28,24 +48,35 @@ export async function POST(request: NextRequest) {
     ok: true,
     redirectTo: getAccessRoleRedirectPath(role)
   });
-  response.headers.set("Cache-Control", "private, no-store, max-age=0");
-  response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
-  response.cookies.set(COOKIE_NAME, "granted", {
-    httpOnly: true,
-    sameSite: "strict",
-    secure: request.nextUrl.protocol === "https:",
-    path: "/",
-    maxAge: 60 * 60 * 8
-  });
-  response.cookies.set(accessRoleCookieName, role, {
-    httpOnly: true,
-    sameSite: "strict",
-    secure: request.nextUrl.protocol === "https:",
-    path: "/",
-    maxAge: 60 * 60 * 8
+  return applyAccessCookies(
+    response,
+    role,
+    request.nextUrl.protocol === "https:"
+  );
+}
+
+export async function PATCH(request: NextRequest) {
+  const hasAccess = request.cookies.get(COOKIE_NAME)?.value === "granted";
+
+  if (!hasAccess) {
+    return NextResponse.json(
+      { ok: false, error: "Authentication required." },
+      { status: 401 }
+    );
+  }
+
+  const body = (await request.json()) as { role?: string };
+  const role = normalizeAccessRole(body.role);
+  const response = NextResponse.json({
+    ok: true,
+    redirectTo: getAccessRoleRedirectPath(role)
   });
 
-  return response;
+  return applyAccessCookies(
+    response,
+    role,
+    request.nextUrl.protocol === "https:"
+  );
 }
 
 export async function DELETE() {

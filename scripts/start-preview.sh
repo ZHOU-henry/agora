@@ -8,6 +8,20 @@ PASSWORD="${2:-}"
 PID_FILE="$ROOT_DIR/.agora-preview.pid"
 LOG_FILE="${TMPDIR:-/tmp}/agora-preview.log"
 
+get_lan_ip() {
+  python3 - <<'PY'
+import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+try:
+    s.connect(("8.8.8.8", 80))
+    print(s.getsockname()[0])
+except Exception:
+    print("")
+finally:
+    s.close()
+PY
+}
+
 if [[ "$MODE" != "readonly" && "$MODE" != "interactive" ]]; then
   echo "Usage: ./scripts/start-preview.sh [readonly|interactive] [password]"
   exit 1
@@ -55,4 +69,8 @@ echo "Mode: $MODE"
 echo "PID: $PREVIEW_PID"
 echo "Log: $LOG_FILE"
 echo "Web: http://localhost:3000"
+LAN_IP="$(get_lan_ip)"
+if [[ -n "$LAN_IP" ]]; then
+  echo "LAN: http://$LAN_IP:3000/access"
+fi
 echo "Queue: http://localhost:3000/queue"

@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import {
   DemandResponseInputSchema,
   TaskRequestDetailSchema,
   type ProviderProfile,
   type TaskRequestDetail
 } from "@agora/shared/domain";
+import { useRouter } from "next/navigation";
 import { browserApiBasePath } from "../lib/api";
 import type { Locale } from "../lib/locale";
 import { formatTimestamp, humanizeToken, toneClass } from "../lib/presenters";
@@ -23,6 +24,7 @@ export function BuilderResponseForm({
   providers,
   locale
 }: BuilderResponseFormProps) {
+  const router = useRouter();
   const readOnlyPreview = isReadOnlyPreviewMode();
   const [request, setRequest] = useState(initialRequest);
   const [providerId, setProviderId] = useState(providers[0]?.id ?? "");
@@ -33,6 +35,10 @@ export function BuilderResponseForm({
   const [confidence, setConfidence] = useState<"high" | "medium" | "low">("medium");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setRequest(initialRequest);
+  }, [initialRequest]);
 
   const t = locale === "zh"
     ? {
@@ -129,6 +135,9 @@ export function BuilderResponseForm({
       setDeliveryApproach("");
       setEtaLabel("");
       setConfidence("medium");
+      startTransition(() => {
+        router.refresh();
+      });
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : t.failed);
     } finally {

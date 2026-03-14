@@ -1,10 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  accessRoleCookieName,
+  canAccessRoleWriteApiPath,
+  normalizeAccessRole
+} from "../../../../lib/access-role";
 import { internalApiBaseUrl } from "../../../../lib/api-config";
 
 async function proxy(request: NextRequest, path: string[]) {
   const targetPath = path.join("/");
   const query = request.nextUrl.searchParams.toString();
   const targetUrl = `${internalApiBaseUrl}/${targetPath}${query ? `?${query}` : ""}`;
+  const pathname = `/${targetPath}`;
+  const role = normalizeAccessRole(request.cookies.get(accessRoleCookieName)?.value);
+
+  if (!canAccessRoleWriteApiPath(role, request.method, pathname)) {
+    return NextResponse.json(
+      { error: "This action is not available for the current role." },
+      { status: 403 }
+    );
+  }
 
   const init: RequestInit = {
     method: request.method,
@@ -45,6 +59,14 @@ export async function POST(
 }
 
 export async function PATCH(
+  request: NextRequest,
+  context: { params: Promise<{ path: string[] }> }
+) {
+  const { path } = await context.params;
+  return proxy(request, path);
+}
+
+export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ path: string[] }> }
 ) {

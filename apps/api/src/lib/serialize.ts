@@ -1,15 +1,19 @@
 import type { Prisma } from "@prisma/client";
 import type {
   AgentDefinition,
+  CustomerConfirmationRecord,
   EngagementAgreementRecord,
   DemandBoardItem,
   DemandResponseRecord,
   EngagementDetail,
   EngagementDeliverableRecord,
+  EngagementFeedbackRecord,
+  EngagementIncidentRecord,
   EngagementMilestoneRecord,
   EngagementRecord,
   EngagementReviewRecord,
   ProviderAgentReference,
+  ProviderEngagementReference,
   ProviderProfile,
   ProviderProfileDetail,
   ProviderResponseReference,
@@ -26,6 +30,10 @@ type DbEngagementMilestone = Prisma.EngagementMilestoneGetPayload<Record<string,
 type DbEngagementDeliverable = Prisma.EngagementDeliverableGetPayload<Record<string, never>>;
 type DbEngagementReview = Prisma.EngagementReviewGetPayload<Record<string, never>>;
 type DbEngagementAgreement = Prisma.EngagementAgreementGetPayload<Record<string, never>>;
+type DbEngagementCustomerConfirmation =
+  Prisma.EngagementCustomerConfirmationGetPayload<Record<string, never>>;
+type DbEngagementFeedback = Prisma.EngagementFeedbackGetPayload<Record<string, never>>;
+type DbEngagementIncident = Prisma.EngagementIncidentGetPayload<Record<string, never>>;
 type DbTaskRequest = Prisma.TaskRequestGetPayload<Record<string, never>>;
 type DbTaskRun = Prisma.TaskRunGetPayload<Record<string, never>>;
 type DbRunEvent = Prisma.RunEventGetPayload<Record<string, never>>;
@@ -60,6 +68,14 @@ export function serializeProviderAgentReference(
 export function serializeProviderProfileDetail(
   provider: DbProvider & {
     agents: DbAgent[];
+    engagements: Array<
+      DbEngagement & {
+        provider: DbProvider;
+        taskRequest: DbTaskRequest & {
+          agent: DbAgent;
+        };
+      }
+    >;
     responses: Array<
       DbDemandResponse & {
         provider: DbProvider;
@@ -71,7 +87,8 @@ export function serializeProviderProfileDetail(
   return {
     ...serializeProviderProfile(provider),
     agents: provider.agents.map(serializeProviderAgentReference),
-    responses: provider.responses.map(serializeProviderResponseReference)
+    responses: provider.responses.map(serializeProviderResponseReference),
+    engagements: provider.engagements.map(serializeProviderEngagementReference)
   };
 }
 
@@ -107,9 +124,37 @@ export function serializeProviderResponseReference(
   };
 }
 
+export function serializeProviderEngagementReference(
+  engagement: DbEngagement & {
+    provider: DbProvider;
+    taskRequest: DbTaskRequest & {
+      agent: DbAgent;
+    };
+  }
+): ProviderEngagementReference {
+  return {
+    ...serializeEngagementRecord(engagement),
+    agent: serializeProviderAgentReference(engagement.taskRequest.agent),
+    taskRequestTitle: engagement.taskRequest.title,
+    industry: engagement.taskRequest.industry ?? "",
+    requesterOrg: engagement.taskRequest.requesterOrg ?? ""
+  };
+}
+
 export function serializeEngagementRecord(
-  engagement: DbEngagement & { provider: DbProvider }
+  engagement: DbEngagement & {
+    provider: DbProvider;
+    taskRequest?: DbTaskRequest & {
+      runs?: DbTaskRun[];
+    };
+    customerConfirmation?: DbEngagementCustomerConfirmation | null;
+    feedbackItems?: DbEngagementFeedback[];
+    incidents?: DbEngagementIncident[];
+  }
 ): EngagementRecord {
+  const feedbackItems = engagement.feedbackItems ?? [];
+  const incidents = engagement.incidents ?? [];
+
   return {
     id: engagement.id,
     taskRequestId: engagement.taskRequestId,
@@ -118,6 +163,16 @@ export function serializeEngagementRecord(
     status: engagement.status as EngagementRecord["status"],
     title: engagement.title,
     summary: engagement.summary,
+    taskRunCount: engagement.taskRequest?.runs?.length ?? 0,
+    feedbackCount: feedbackItems.length,
+    unresolvedFeedbackCount: feedbackItems.filter(
+      (item) => item.status !== "resolved"
+    ).length,
+    incidentCount: incidents.length,
+    openIncidentCount: incidents.filter((item) => item.status !== "resolved").length,
+    customerConfirmationStatus: engagement.customerConfirmation?.status
+      ? (engagement.customerConfirmation.status as EngagementRecord["customerConfirmationStatus"])
+      : null,
     createdAt: engagement.createdAt.toISOString(),
     updatedAt: engagement.updatedAt.toISOString()
   };
@@ -180,6 +235,57 @@ export function serializeEngagementAgreementRecord(
     notes: agreement.notes,
     createdAt: agreement.createdAt.toISOString(),
     updatedAt: agreement.updatedAt.toISOString()
+  };
+}
+
+export function serializeCustomerConfirmationRecord(
+  confirmation: DbEngagementCustomerConfirmation
+): CustomerConfirmationRecord {
+  return {
+    id: confirmation.id,
+    engagementId: confirmation.engagementId,
+    status: confirmation.status as CustomerConfirmationRecord["status"],
+    summary: confirmation.summary,
+    notes: confirmation.notes,
+    nextStep: confirmation.nextStep ?? null,
+    confirmedAt: confirmation.confirmedAt?.toISOString() ?? null,
+    createdAt: confirmation.createdAt.toISOString(),
+    updatedAt: confirmation.updatedAt.toISOString()
+  };
+}
+
+export function serializeEngagementFeedbackRecord(
+  feedback: DbEngagementFeedback
+): EngagementFeedbackRecord {
+  return {
+    id: feedback.id,
+    engagementId: feedback.engagementId,
+    title: feedback.title,
+    details: feedback.details,
+    category: feedback.category as EngagementFeedbackRecord["category"],
+    status: feedback.status as EngagementFeedbackRecord["status"],
+    authorRole: feedback.authorRole,
+    responseNote: feedback.responseNote ?? null,
+    createdAt: feedback.createdAt.toISOString(),
+    updatedAt: feedback.updatedAt.toISOString()
+  };
+}
+
+export function serializeEngagementIncidentRecord(
+  incident: DbEngagementIncident
+): EngagementIncidentRecord {
+  return {
+    id: incident.id,
+    engagementId: incident.engagementId,
+    title: incident.title,
+    summary: incident.summary,
+    severity: incident.severity as EngagementIncidentRecord["severity"],
+    status: incident.status as EngagementIncidentRecord["status"],
+    authorRole: incident.authorRole,
+    responseNote: incident.responseNote ?? null,
+    openedAt: incident.openedAt.toISOString(),
+    resolvedAt: incident.resolvedAt?.toISOString() ?? null,
+    updatedAt: incident.updatedAt.toISOString()
   };
 }
 
@@ -338,12 +444,16 @@ export function serializeEngagementDetail(
     provider: DbProvider;
     taskRequest: DbTaskRequest & {
       agent: DbAgent & { provider: DbProvider | null };
+      runs: DbTaskRun[];
     };
     demandResponse: DbDemandResponse & { provider: DbProvider };
     milestones: DbEngagementMilestone[];
     deliverables: DbEngagementDeliverable[];
     reviews: DbEngagementReview[];
     agreement: DbEngagementAgreement | null;
+    customerConfirmation: DbEngagementCustomerConfirmation | null;
+    feedbackItems: DbEngagementFeedback[];
+    incidents: DbEngagementIncident[];
   }
 ): EngagementDetail {
   return {
@@ -363,12 +473,18 @@ export function serializeEngagementDetail(
     },
     agent: serializeAgentDefinition(engagement.taskRequest.agent),
     demandResponse: serializeDemandResponseRecord(engagement.demandResponse),
+    taskRuns: engagement.taskRequest.runs.map(serializeTaskRunRecord),
     milestones: engagement.milestones.map(serializeEngagementMilestoneRecord),
     deliverables: engagement.deliverables.map(serializeEngagementDeliverableRecord),
     reviews: engagement.reviews.map(serializeEngagementReviewRecord),
     agreement: engagement.agreement
       ? serializeEngagementAgreementRecord(engagement.agreement)
-      : null
+      : null,
+    customerConfirmation: engagement.customerConfirmation
+      ? serializeCustomerConfirmationRecord(engagement.customerConfirmation)
+      : null,
+    feedbackItems: engagement.feedbackItems.map(serializeEngagementFeedbackRecord),
+    incidents: engagement.incidents.map(serializeEngagementIncidentRecord)
   };
 }
 

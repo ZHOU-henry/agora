@@ -1,9 +1,18 @@
 import Fastify from "fastify";
 import {
+  CustomerConfirmationInputSchema,
+  EngagementAgreementInputSchema,
+  EngagementDeliverableInputSchema,
   AgentDefinitionInputSchema,
+  DemandBoardPublishInputSchema,
   DemandResponseInputSchema,
   DemandResponseStatusUpdateInputSchema,
   EngagementDeliverableStatusUpdateInputSchema,
+  EngagementFeedbackInputSchema,
+  EngagementFeedbackStatusUpdateInputSchema,
+  EngagementIncidentInputSchema,
+  EngagementIncidentStatusUpdateInputSchema,
+  EngagementMilestoneInputSchema,
   EngagementReviewInputSchema,
   EngagementStatusUpdateInputSchema,
   ProviderProfileInputSchema,
@@ -18,9 +27,17 @@ import {
   syncAgentDefinitions
 } from "./data/agents.js";
 import {
+  addEngagementFeedback,
+  addEngagementIncident,
+  addEngagementDeliverable,
+  addEngagementMilestone,
   getEngagementById,
   listEngagements,
   submitEngagementReview,
+  updateEngagementFeedbackStatus,
+  updateEngagementIncidentStatus,
+  upsertEngagementAgreement,
+  upsertEngagementCustomerConfirmation,
   updateEngagementDeliverableStatus,
   updateEngagementStatus
 } from "./data/engagements.js";
@@ -174,6 +191,202 @@ server.patch("/engagement-deliverables/:id/status", async (request, reply) => {
   };
 });
 
+server.post("/engagements/:id/milestones", async (request, reply) => {
+  if (isReadOnlyPreviewMode()) {
+    return conflict(reply, "Preview mode is read-only");
+  }
+
+  const { id } = request.params as { id: string };
+  const parsed = EngagementMilestoneInputSchema.safeParse(request.body);
+
+  if (!parsed.success) {
+    return badRequest(reply, "Invalid engagement milestone", parsed.error.flatten());
+  }
+
+  const engagement = await addEngagementMilestone(id, parsed.data);
+
+  if (!engagement) {
+    return notFound(reply, "Engagement not found");
+  }
+
+  return reply.code(201).send({
+    item: engagement
+  });
+});
+
+server.post("/engagements/:id/deliverables", async (request, reply) => {
+  if (isReadOnlyPreviewMode()) {
+    return conflict(reply, "Preview mode is read-only");
+  }
+
+  const { id } = request.params as { id: string };
+  const parsed = EngagementDeliverableInputSchema.safeParse(request.body);
+
+  if (!parsed.success) {
+    return badRequest(reply, "Invalid engagement deliverable", parsed.error.flatten());
+  }
+
+  const engagement = await addEngagementDeliverable(id, parsed.data);
+
+  if (!engagement) {
+    return notFound(reply, "Engagement not found");
+  }
+
+  return reply.code(201).send({
+    item: engagement
+  });
+});
+
+server.put("/engagements/:id/agreement", async (request, reply) => {
+  if (isReadOnlyPreviewMode()) {
+    return conflict(reply, "Preview mode is read-only");
+  }
+
+  const { id } = request.params as { id: string };
+  const parsed = EngagementAgreementInputSchema.safeParse(request.body);
+
+  if (!parsed.success) {
+    return badRequest(reply, "Invalid engagement agreement", parsed.error.flatten());
+  }
+
+  const engagement = await upsertEngagementAgreement(id, parsed.data);
+
+  if (!engagement) {
+    return notFound(reply, "Engagement not found");
+  }
+
+  return {
+    item: engagement
+  };
+});
+
+server.put("/engagements/:id/customer-confirmation", async (request, reply) => {
+  if (isReadOnlyPreviewMode()) {
+    return conflict(reply, "Preview mode is read-only");
+  }
+
+  const { id } = request.params as { id: string };
+  const parsed = CustomerConfirmationInputSchema.safeParse(request.body);
+
+  if (!parsed.success) {
+    return badRequest(
+      reply,
+      "Invalid customer confirmation update",
+      parsed.error.flatten()
+    );
+  }
+
+  const engagement = await upsertEngagementCustomerConfirmation(id, parsed.data);
+
+  if (!engagement) {
+    return notFound(reply, "Engagement not found");
+  }
+
+  return {
+    item: engagement
+  };
+});
+
+server.post("/engagements/:id/feedback", async (request, reply) => {
+  if (isReadOnlyPreviewMode()) {
+    return conflict(reply, "Preview mode is read-only");
+  }
+
+  const { id } = request.params as { id: string };
+  const parsed = EngagementFeedbackInputSchema.safeParse(request.body);
+
+  if (!parsed.success) {
+    return badRequest(reply, "Invalid engagement feedback", parsed.error.flatten());
+  }
+
+  const engagement = await addEngagementFeedback(id, parsed.data);
+
+  if (!engagement) {
+    return notFound(reply, "Engagement not found");
+  }
+
+  return reply.code(201).send({
+    item: engagement
+  });
+});
+
+server.patch("/engagement-feedback/:id/status", async (request, reply) => {
+  if (isReadOnlyPreviewMode()) {
+    return conflict(reply, "Preview mode is read-only");
+  }
+
+  const { id } = request.params as { id: string };
+  const parsed = EngagementFeedbackStatusUpdateInputSchema.safeParse(request.body);
+
+  if (!parsed.success) {
+    return badRequest(
+      reply,
+      "Invalid engagement feedback status update",
+      parsed.error.flatten()
+    );
+  }
+
+  const engagement = await updateEngagementFeedbackStatus(id, parsed.data);
+
+  if (!engagement) {
+    return notFound(reply, "Engagement feedback not found");
+  }
+
+  return {
+    item: engagement
+  };
+});
+
+server.post("/engagements/:id/incidents", async (request, reply) => {
+  if (isReadOnlyPreviewMode()) {
+    return conflict(reply, "Preview mode is read-only");
+  }
+
+  const { id } = request.params as { id: string };
+  const parsed = EngagementIncidentInputSchema.safeParse(request.body);
+
+  if (!parsed.success) {
+    return badRequest(reply, "Invalid engagement incident", parsed.error.flatten());
+  }
+
+  const engagement = await addEngagementIncident(id, parsed.data);
+
+  if (!engagement) {
+    return notFound(reply, "Engagement not found");
+  }
+
+  return reply.code(201).send({
+    item: engagement
+  });
+});
+
+server.patch("/engagement-incidents/:id/status", async (request, reply) => {
+  if (isReadOnlyPreviewMode()) {
+    return conflict(reply, "Preview mode is read-only");
+  }
+
+  const { id } = request.params as { id: string };
+  const parsed = EngagementIncidentStatusUpdateInputSchema.safeParse(request.body);
+
+  if (!parsed.success) {
+    return badRequest(
+      reply,
+      "Invalid engagement incident status update",
+      parsed.error.flatten()
+    );
+  }
+
+  const engagement = await updateEngagementIncidentStatus(id, parsed.data);
+
+  if (!engagement) {
+    return notFound(reply, "Engagement incident not found");
+  }
+
+  return {
+    item: engagement
+  };
+});
+
 server.post("/engagements/:id/reviews", async (request, reply) => {
   if (isReadOnlyPreviewMode()) {
     return conflict(reply, "Preview mode is read-only");
@@ -241,6 +454,28 @@ server.get("/task-requests", async () => {
   return {
     items: await listTaskRequests()
   };
+});
+
+server.post("/demand-board", async (request, reply) => {
+  if (isReadOnlyPreviewMode()) {
+    return conflict(reply, "Preview mode is read-only");
+  }
+
+  const parsed = DemandBoardPublishInputSchema.safeParse(request.body);
+
+  if (!parsed.success) {
+    return badRequest(reply, "Invalid demand board submission", parsed.error.flatten());
+  }
+
+  const record = await createTaskRequest(parsed.data);
+
+  if ("error" in record) {
+    return badRequest(reply, "Selected agent is not available", record);
+  }
+
+  return reply.code(201).send({
+    item: record
+  });
 });
 
 server.get("/demand-board", async () => {

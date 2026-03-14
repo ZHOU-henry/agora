@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma.js";
+import { ensureEngagementScaffold } from "./engagement-scaffold.js";
 
 const seededDemands = [
   {
@@ -225,7 +226,7 @@ export async function syncSeededMarketplaceData() {
       continue;
     }
 
-    await prisma.engagement.upsert({
+    const engagement = await prisma.engagement.upsert({
       where: {
         taskRequestId: response.taskRequestId
       },
@@ -246,162 +247,10 @@ export async function syncSeededMarketplaceData() {
       }
     });
 
-    const engagement = await prisma.engagement.findUnique({
-      where: {
-        taskRequestId: response.taskRequestId
-      }
-    });
-
-    if (!engagement) {
-      continue;
-    }
-
-    const milestones = [
-      {
-        id: `milestone-${response.taskRequestId}-kickoff`,
-        title: "Kickoff alignment",
-        summary: "Confirm the customer goal, success boundary, and first deployment scope.",
-        status: "completed",
-        dueLabel: "day 1"
-      },
-      {
-        id: `milestone-${response.taskRequestId}-scoping`,
-        title: "Delivery scoping",
-        summary: "Freeze the first pilot boundary, data assumptions, and operator touchpoints.",
-        status: "in_progress",
-        dueLabel: "week 1"
-      },
-      {
-        id: `milestone-${response.taskRequestId}-pilot`,
-        title: "Pilot build",
-        summary: "Ship the first scenario-specific pilot slice for operator validation.",
-        status: "planned",
-        dueLabel: "week 2-3"
-      }
-    ] as const;
-
-    for (const milestone of milestones) {
-      await prisma.engagementMilestone.upsert({
-        where: {
-          id: milestone.id
-        },
-        update: {
-          title: milestone.title,
-          summary: milestone.summary,
-          status: milestone.status,
-          dueLabel: milestone.dueLabel,
-          engagementId: engagement.id
-        },
-        create: {
-          id: milestone.id,
-          title: milestone.title,
-          summary: milestone.summary,
-          status: milestone.status,
-          dueLabel: milestone.dueLabel,
-          engagementId: engagement.id
-        }
-      });
-    }
-
-    const deliverables = [
-      {
-        id: `deliverable-${response.taskRequestId}-scope`,
-        title: "Pilot scope brief",
-        summary: "Define the first bounded delivery scope, rollout limits, and operator touchpoints.",
-        artifactType: "brief",
-        status: "approved"
-      },
-      {
-        id: `deliverable-${response.taskRequestId}-workflow`,
-        title: "Workflow prototype",
-        summary: "The first runnable workflow artifact for customer-side evaluation.",
-        artifactType: "prototype",
-        status: "in_review"
-      }
-    ] as const;
-
-    for (const deliverable of deliverables) {
-      await prisma.engagementDeliverable.upsert({
-        where: {
-          id: deliverable.id
-        },
-        update: {
-          title: deliverable.title,
-          summary: deliverable.summary,
-          artifactType: deliverable.artifactType,
-          status: deliverable.status,
-          engagementId: engagement.id
-        },
-        create: {
-          id: deliverable.id,
-          title: deliverable.title,
-          summary: deliverable.summary,
-          artifactType: deliverable.artifactType,
-          status: deliverable.status,
-          engagementId: engagement.id
-        }
-      });
-    }
-
-    const reviews = [
-      {
-        id: `review-${response.taskRequestId}-scope`,
-        verdict: "approved",
-        notes: "Scope is tight enough for a first pilot and aligned with the customer's actual operating pain.",
-        deliverableId: `deliverable-${response.taskRequestId}-scope`
-      },
-      {
-        id: `review-${response.taskRequestId}-workflow`,
-        verdict: "needs_work",
-        notes: "Workflow prototype is promising, but operator explanations still need sharper language before rollout.",
-        deliverableId: `deliverable-${response.taskRequestId}-workflow`
-      }
-    ] as const;
-
-    for (const review of reviews) {
-      await prisma.engagementReview.upsert({
-        where: {
-          id: review.id
-        },
-        update: {
-          verdict: review.verdict,
-          notes: review.notes,
-          engagementId: engagement.id,
-          deliverableId: review.deliverableId
-        },
-        create: {
-          id: review.id,
-          verdict: review.verdict,
-          notes: review.notes,
-          engagementId: engagement.id,
-          deliverableId: review.deliverableId
-        }
-      });
-    }
-
-    await prisma.engagementAgreement.upsert({
-      where: {
-        engagementId: engagement.id
-      },
-      update: {
-        status: "confirmed",
-        engagementMode: "pilot",
-        billingModel: "fixed scope",
-        budgetLabel: "RMB 80k - 150k",
-        startWindow: "within 2 weeks",
-        notes:
-          "Commercial frame is still intentionally light, but the customer and builder have aligned on a bounded pilot and a first budget band."
-      },
-      create: {
-        engagementId: engagement.id,
-        status: "confirmed",
-        engagementMode: "pilot",
-        billingModel: "fixed scope",
-        budgetLabel: "RMB 80k - 150k",
-        startWindow: "within 2 weeks",
-        notes:
-          "Commercial frame is still intentionally light, but the customer and builder have aligned on a bounded pilot and a first budget band."
-      }
+    await ensureEngagementScaffold(prisma, {
+      engagementId: engagement.id,
+      taskRequestId: response.taskRequestId,
+      mode: "demo"
     });
   }
 }

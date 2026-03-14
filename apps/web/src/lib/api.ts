@@ -100,7 +100,8 @@ export async function getProviderDetail(slug: string) {
           summary: agent.summary,
           status: agent.status
         })),
-      responses: []
+      responses: [],
+      engagements: []
     };
   }
 

@@ -6,9 +6,19 @@ const tokenLabelsZh: Record<string, string> = {
   active: "已启用",
   draft: "草稿",
   submitted: "已提交",
+  shortlisted: "已入围",
+  accepted: "已接受",
+  declined: "已拒绝",
   running: "运行中",
   completed: "已完成",
   failed: "失败",
+  kickoff: "启动中",
+  scoping: "范围定义",
+  building: "构建中",
+  delivered: "已交付",
+  planned: "已规划",
+  in_progress: "进行中",
+  in_review: "审核中",
   approved: "通过",
   needs_work: "需返工",
   rejected: "拒绝",
@@ -45,6 +55,24 @@ const tokenLabelsZh: Record<string, string> = {
   seeded: "种子供给",
   reviewed_external: "已审核外部来源",
   mixed: "混合来源",
+  confirmed: "已确认",
+  pending: "待确认",
+  issues_reported: "已反馈问题",
+  expansion_requested: "希望扩展",
+  acknowledged: "已确认收到",
+  resolved: "已解决",
+  open: "待处理",
+  investigating: "调查中",
+  mitigated: "已缓解",
+  critical: "严重",
+  field_feedback: "现场反馈",
+  environment_change: "环境变化",
+  maintenance_request: "维护需求",
+  expansion_signal: "扩展信号",
+  stable: "稳定",
+  watch: "观察中",
+  blocked: "阻塞",
+  expansion: "可扩展",
   newest: "最新优先",
   oldest: "最早优先",
   "review-priority": "审核优先",
@@ -104,21 +132,44 @@ export function titleizeToken(value: string, locale: Locale = "en") {
 
 export function toneClass(value: string | null | undefined) {
   switch (value) {
-    case "running":
-      return "tone-cyan";
     case "completed":
     case "approved":
+    case "accepted":
+    case "confirmed":
+    case "delivered":
+    case "resolved":
+    case "stable":
       return "tone-emerald";
     case "failed":
     case "rejected":
+    case "declined":
+    case "issues_reported":
+    case "open":
+    case "critical":
+    case "blocked":
       return "tone-rose";
     case "submitted":
     case "needs_work":
     case "readonly":
+    case "shortlisted":
+    case "in_review":
+    case "pending":
+    case "watch":
       return "tone-amber";
     case "active":
     case "interactive":
+    case "building":
+    case "expansion_requested":
+    case "expansion":
       return "tone-violet";
+    case "running":
+    case "kickoff":
+    case "scoping":
+    case "in_progress":
+    case "acknowledged":
+    case "investigating":
+    case "mitigated":
+      return "tone-cyan";
     default:
       return "tone-neutral";
   }

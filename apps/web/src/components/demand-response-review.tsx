@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { startTransition, useEffect, useState } from "react";
 import {
   DemandResponseStatusUpdateInputSchema,
   TaskRequestDetailSchema,
   type TaskRequestDetail
 } from "@agora/shared/domain";
+import { useRouter } from "next/navigation";
 import { browserApiBasePath } from "../lib/api";
 import type { Locale } from "../lib/locale";
 import { formatTimestamp, humanizeToken, toneClass } from "../lib/presenters";
@@ -22,10 +23,15 @@ export function DemandResponseReview({
   initialRequest,
   locale
 }: DemandResponseReviewProps) {
+  const router = useRouter();
   const readOnlyPreview = isReadOnlyPreviewMode();
   const [request, setRequest] = useState(initialRequest);
   const [error, setError] = useState("");
   const [pendingId, setPendingId] = useState("");
+
+  useEffect(() => {
+    setRequest(initialRequest);
+  }, [initialRequest]);
 
   const t =
     locale === "zh"
@@ -100,6 +106,9 @@ export function DemandResponseReview({
       }
 
       setRequest(parsedItem.data);
+      startTransition(() => {
+        router.refresh();
+      });
     } catch (updateError) {
       setError(updateError instanceof Error ? updateError.message : t.failed);
     } finally {

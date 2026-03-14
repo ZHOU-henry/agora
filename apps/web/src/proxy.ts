@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   accessRoleCookieName,
+  canAccessRoleVisitPath,
   getAccessRoleRedirectPath,
   normalizeAccessRole
 } from "./lib/access-role";
@@ -28,6 +29,7 @@ export function proxy(request: NextRequest) {
   if (
     pathname === "/access" ||
     pathname.startsWith("/api/access") ||
+    pathname.startsWith("/media/") ||
     pathname.startsWith("/_next") ||
     pathname === "/favicon.ico"
   ) {
@@ -38,10 +40,20 @@ export function proxy(request: NextRequest) {
   const role = normalizeAccessRole(request.cookies.get(accessRoleCookieName)?.value);
 
   if (hasAccess) {
+    if (pathname.startsWith("/api/")) {
+      return applyProtectedHeaders(NextResponse.next());
+    }
+
     if (pathname === "/") {
       const dashboardUrl = new URL(getAccessRoleRedirectPath(role), request.url);
       return applyProtectedHeaders(NextResponse.redirect(dashboardUrl));
     }
+
+    if (!canAccessRoleVisitPath(role, pathname)) {
+      const dashboardUrl = new URL(getAccessRoleRedirectPath(role), request.url);
+      return applyProtectedHeaders(NextResponse.redirect(dashboardUrl));
+    }
+
     return applyProtectedHeaders(NextResponse.next());
   }
 

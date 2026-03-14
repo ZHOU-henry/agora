@@ -42,7 +42,7 @@ Fields:
 
 ### TaskRequest
 
-Represents a user-submitted need before or during execution.
+Represents the market-side demand object.
 
 Fields:
 
@@ -53,6 +53,82 @@ Fields:
 - `selectedAgentId`
 - `submittedBy`
 - `submittedAt`
+
+### DemandResponse
+
+Represents a builder-side response to a visible customer demand.
+
+Fields:
+
+- `id`
+- `taskRequestId`
+- `providerId`
+- `headline`
+- `proposalSummary`
+- `deliveryApproach`
+- `etaLabel`
+- `confidence`
+- `status`
+
+### Engagement
+
+Represents the formal work object created once one builder response is accepted.
+
+Fields:
+
+- `id`
+- `taskRequestId`
+- `demandResponseId`
+- `providerId`
+- `status`
+- `title`
+- `summary`
+
+### EngagementCustomerConfirmation
+
+Represents the customer-side validation state after delivery.
+
+Fields:
+
+- `id`
+- `engagementId`
+- `status`
+- `summary`
+- `notes`
+- `nextStep`
+- `confirmedAt`
+
+### EngagementFeedback
+
+Represents post-delivery feedback that stays attached to the same engagement.
+
+Fields:
+
+- `id`
+- `engagementId`
+- `title`
+- `details`
+- `category`
+- `status`
+- `authorRole`
+- `responseNote`
+
+### EngagementIncident
+
+Represents a field issue or deployment incident that requires handling.
+
+Fields:
+
+- `id`
+- `engagementId`
+- `title`
+- `summary`
+- `severity`
+- `status`
+- `authorRole`
+- `responseNote`
+- `openedAt`
+- `resolvedAt`
 
 ### TaskRun
 
@@ -118,7 +194,14 @@ Fields:
 - one `ProviderProfile` can have many `AgentDefinition`s
 - one `AgentDefinition` has many `CapabilityTag`s
 - one `TaskRequest` selects one `AgentDefinition`
-- one `TaskRequest` can have many `TaskRun`s
+- one `TaskRequest` can have many `DemandResponse`s
+- one `TaskRequest` can have zero or one `Engagement`
+- one accepted-response engagement can bootstrap one or more `TaskRun`s through the linked `TaskRequest`
+- one `DemandResponse` belongs to one `ProviderProfile`
+- one accepted `DemandResponse` can become one `Engagement`
+- one `Engagement` can have zero or one `EngagementCustomerConfirmation`
+- one `Engagement` can have many `EngagementFeedback` items
+- one `Engagement` can have many `EngagementIncident` items
 - one `TaskRun` has many `RunEvent`s
 - one `TaskRun` can have zero or one `ReviewDecision`
 - one `TaskRun` or `AgentDefinition` can have many `ProvenanceRecord`s
@@ -130,12 +213,24 @@ Persisted now:
 - `ProviderProfile`
 - `AgentDefinition`
 - `TaskRequest`
+- `DemandResponse`
+- `Engagement`
+- `EngagementMilestone`
+- `EngagementDeliverable`
+- `EngagementReview`
+- `EngagementAgreement`
+- `EngagementCustomerConfirmation`
+- `EngagementFeedback`
+- `EngagementIncident`
 - `TaskRun`
 - `RunEvent`
 - `ReviewDecision`
 
 Represented in the operator UI now:
 
+- demand board publishing and browsing
+- builder response submission and decision flow
+- engagement list and engagement detail surfaces
 - queue view for active and review-ready runs
 - provenance metadata on agents and run surfaces
 
@@ -144,8 +239,12 @@ Represented in the operator UI now:
 Keep the model centered on:
 
 - discoverability
-- task submission
+- demand publishing
+- response selection
+- engagement tracking
 - execution trace
+- post-delivery customer validation
+- feedback and incident closure
 - operator review
 
 Do not add billing, settlement, or generalized marketplace economics to the core model yet.

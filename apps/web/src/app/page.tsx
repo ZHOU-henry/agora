@@ -98,7 +98,9 @@ export default async function HomePage({ searchParams }: HomePageProps) {
           <p className="lede">
             Agora is a narrow operator-facing MVP for cataloging agent capabilities,
             routing work, and reviewing execution traces without losing provenance or
-            operational clarity.
+            operational clarity. The current demo starts with a seeded first-party
+            cohort, but the platform direction is open to outside AI agent developers
+            building specialized agents for real customer demand.
           </p>
           <div className="buttonrow">
             <Link href="/queue" className="actionlink actionlink-primary">
@@ -112,6 +114,7 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <span className="datachip">phase-1 control model</span>
             <span className="datachip">persistent task lifecycle</span>
             <span className="datachip">operator review in-loop</span>
+            <span className="datachip">seeded now, open developer-side later</span>
           </div>
         </div>
 
@@ -147,6 +150,10 @@ export default async function HomePage({ searchParams }: HomePageProps) {
             <article className="signalitem">
               <span>catalog status</span>
               <strong>{agents.every((agent) => agent.status === "active") ? "Live" : "Mixed"}</strong>
+            </article>
+            <article className="signalitem">
+              <span>supply model</span>
+              <strong>first-party seeded, multi-developer by design</strong>
             </article>
           </div>
         </aside>
@@ -208,10 +215,11 @@ export default async function HomePage({ searchParams }: HomePageProps) {
       <section className="panel">
         <div className="sectionhead">
           <p className="eyebrow">Agent Catalog</p>
-          <h2>Seeded operators with explicit role boundaries</h2>
+          <h2>Seeded first-party operators with explicit role boundaries</h2>
           <p className="lede small">
             Every card exposes the role, provenance posture, and trust framing required
-            before an operator routes work.
+            before an operator routes work. This launch cohort is the first supply-side
+            layer, not the final limit of who can build on the platform.
           </p>
         </div>
         {filteredAgents.length === 0 ? (

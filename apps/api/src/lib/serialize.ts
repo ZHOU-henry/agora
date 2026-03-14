@@ -4,6 +4,7 @@ import type {
   DemandBoardItem,
   DemandResponseRecord,
   EngagementDetail,
+  EngagementMilestoneRecord,
   EngagementRecord,
   ProviderAgentReference,
   ProviderProfile,
@@ -18,6 +19,7 @@ type DbAgent = Prisma.AgentDefinitionGetPayload<Record<string, never>>;
 type DbProvider = Prisma.ProviderProfileGetPayload<Record<string, never>>;
 type DbDemandResponse = Prisma.DemandResponseGetPayload<Record<string, never>>;
 type DbEngagement = Prisma.EngagementGetPayload<Record<string, never>>;
+type DbEngagementMilestone = Prisma.EngagementMilestoneGetPayload<Record<string, never>>;
 type DbTaskRequest = Prisma.TaskRequestGetPayload<Record<string, never>>;
 type DbTaskRun = Prisma.TaskRunGetPayload<Record<string, never>>;
 type DbRunEvent = Prisma.RunEventGetPayload<Record<string, never>>;
@@ -112,6 +114,21 @@ export function serializeEngagementRecord(
     summary: engagement.summary,
     createdAt: engagement.createdAt.toISOString(),
     updatedAt: engagement.updatedAt.toISOString()
+  };
+}
+
+export function serializeEngagementMilestoneRecord(
+  milestone: DbEngagementMilestone
+): EngagementMilestoneRecord {
+  return {
+    id: milestone.id,
+    engagementId: milestone.engagementId,
+    title: milestone.title,
+    summary: milestone.summary,
+    status: milestone.status as EngagementMilestoneRecord["status"],
+    dueLabel: milestone.dueLabel ?? "",
+    createdAt: milestone.createdAt.toISOString(),
+    updatedAt: milestone.updatedAt.toISOString()
   };
 }
 
@@ -272,6 +289,7 @@ export function serializeEngagementDetail(
       agent: DbAgent & { provider: DbProvider | null };
     };
     demandResponse: DbDemandResponse & { provider: DbProvider };
+    milestones: DbEngagementMilestone[];
   }
 ): EngagementDetail {
   return {
@@ -290,7 +308,8 @@ export function serializeEngagementDetail(
       agentId: engagement.taskRequest.agentId
     },
     agent: serializeAgentDefinition(engagement.taskRequest.agent),
-    demandResponse: serializeDemandResponseRecord(engagement.demandResponse)
+    demandResponse: serializeDemandResponseRecord(engagement.demandResponse),
+    milestones: engagement.milestones.map(serializeEngagementMilestoneRecord)
   };
 }
 

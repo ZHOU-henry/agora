@@ -35,6 +35,11 @@ export async function getEngagementById(id: string) {
         include: {
           provider: true
         }
+      },
+      milestones: {
+        orderBy: {
+          createdAt: "asc"
+        }
       }
     }
   });

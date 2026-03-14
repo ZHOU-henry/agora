@@ -245,5 +245,62 @@ export async function syncSeededMarketplaceData() {
         summary: response.proposalSummary
       }
     });
+
+    const engagement = await prisma.engagement.findUnique({
+      where: {
+        taskRequestId: response.taskRequestId
+      }
+    });
+
+    if (!engagement) {
+      continue;
+    }
+
+    const milestones = [
+      {
+        id: `milestone-${response.taskRequestId}-kickoff`,
+        title: "Kickoff alignment",
+        summary: "Confirm the customer goal, success boundary, and first deployment scope.",
+        status: "completed",
+        dueLabel: "day 1"
+      },
+      {
+        id: `milestone-${response.taskRequestId}-scoping`,
+        title: "Delivery scoping",
+        summary: "Freeze the first pilot boundary, data assumptions, and operator touchpoints.",
+        status: "in_progress",
+        dueLabel: "week 1"
+      },
+      {
+        id: `milestone-${response.taskRequestId}-pilot`,
+        title: "Pilot build",
+        summary: "Ship the first scenario-specific pilot slice for operator validation.",
+        status: "planned",
+        dueLabel: "week 2-3"
+      }
+    ] as const;
+
+    for (const milestone of milestones) {
+      await prisma.engagementMilestone.upsert({
+        where: {
+          id: milestone.id
+        },
+        update: {
+          title: milestone.title,
+          summary: milestone.summary,
+          status: milestone.status,
+          dueLabel: milestone.dueLabel,
+          engagementId: engagement.id
+        },
+        create: {
+          id: milestone.id,
+          title: milestone.title,
+          summary: milestone.summary,
+          status: milestone.status,
+          dueLabel: milestone.dueLabel,
+          engagementId: engagement.id
+        }
+      });
+    }
   }
 }

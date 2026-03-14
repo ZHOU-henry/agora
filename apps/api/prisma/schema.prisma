@@ -101,6 +101,21 @@ model Engagement {
 
   providerId String
   provider   ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  milestones EngagementMilestone[]
+}
+
+model EngagementMilestone {
+  id        String   @id @default(cuid())
+  title     String
+  summary   String
+  status    String
+  dueLabel  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  engagementId String
+  engagement   Engagement @relation(fields: [engagementId], references: [id], onDelete: Cascade)
 }
 
 model TaskRun {

@@ -128,6 +128,34 @@ export default async function EngagementDetailPage({
 
       <section className="panel">
         <div className="sectionhead">
+          <p className="eyebrow">{locale === "zh" ? "交付里程碑" : "Delivery milestones"}</p>
+          <h2>
+            {locale === "zh"
+              ? "把承接对象推进成真实交付空间"
+              : "Move the engagement into a real delivery workspace"}
+          </h2>
+        </div>
+        <div className="timeline">
+          {engagement.milestones.map((milestone) => (
+            <article key={milestone.id} className="timelineitem">
+              <div className="timelinehead">
+                <p className="tagline">{milestone.title}</p>
+                <span className={`statuspill ${toneClass(milestone.status)}`}>
+                  {humanizeToken(milestone.status, locale)}
+                </span>
+              </div>
+              <p>{milestone.summary}</p>
+              <p className="tagline">
+                {locale === "zh" ? "目标时间" : "Target window"} /{" "}
+                {milestone.dueLabel || "-"}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="sectionhead">
           <p className="eyebrow">{t.proposal}</p>
           <h2>{locale === "zh" ? "关联信息" : "Connected context"}</h2>
         </div>

@@ -410,6 +410,7 @@ const copyByLocale: Record<Locale, AppCopy> = {
         { href: "/", label: "平台" },
         { href: "/demand", label: "需求板" },
         { href: "/providers", label: "开发者" },
+        { href: "/engagements", label: "承接项目" },
         { href: "/queue", label: "执行台" }
       ],
       modeReadOnly: "预览 / 只读",
@@ -927,6 +928,7 @@ const copyByLocale: Record<Locale, AppCopy> = {
         { href: "/", label: "Platform" },
         { href: "/demand", label: "Demand" },
         { href: "/providers", label: "Builders" },
+        { href: "/engagements", label: "Engagements" },
         { href: "/queue", label: "Queue" }
       ],
       modeReadOnly: "preview / read-only",

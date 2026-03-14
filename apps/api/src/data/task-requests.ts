@@ -60,6 +60,11 @@ export async function listTaskRequests() {
         orderBy: {
           createdAt: "desc"
         }
+      },
+      engagement: {
+        include: {
+          provider: true
+        }
       }
     },
     orderBy: {
@@ -90,6 +95,11 @@ export async function getTaskRequestById(id: string) {
         },
         orderBy: {
           createdAt: "desc"
+        }
+      },
+      engagement: {
+        include: {
+          provider: true
         }
       }
     }
@@ -147,6 +157,11 @@ export async function createTaskRequest(input: TaskRequestInput) {
         },
         orderBy: {
           createdAt: "desc"
+        }
+      },
+      engagement: {
+        include: {
+          provider: true
         }
       }
     }
@@ -318,6 +333,11 @@ export async function submitDemandResponse(
         orderBy: {
           createdAt: "desc"
         }
+      },
+      engagement: {
+        include: {
+          provider: true
+        }
       }
     }
   });
@@ -344,6 +364,35 @@ export async function updateDemandResponseStatus(
     }
   });
 
+  if (input.status === "accepted") {
+    await prisma.engagement.upsert({
+      where: {
+        taskRequestId: existing.taskRequestId
+      },
+      update: {
+        providerId: existing.providerId,
+        demandResponseId: existing.id,
+        status: "kickoff",
+        title: existing.headline,
+        summary: existing.proposalSummary
+      },
+      create: {
+        taskRequestId: existing.taskRequestId,
+        providerId: existing.providerId,
+        demandResponseId: existing.id,
+        status: "kickoff",
+        title: existing.headline,
+        summary: existing.proposalSummary
+      }
+    });
+  } else {
+    await prisma.engagement.deleteMany({
+      where: {
+        demandResponseId: existing.id
+      }
+    });
+  }
+
   const detail = await prisma.taskRequest.findUnique({
     where: { id: existing.taskRequestId },
     include: {
@@ -363,6 +412,11 @@ export async function updateDemandResponseStatus(
         },
         orderBy: {
           createdAt: "desc"
+        }
+      },
+      engagement: {
+        include: {
+          provider: true
         }
       }
     }

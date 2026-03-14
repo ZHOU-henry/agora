@@ -59,6 +59,7 @@ const seededResponses = [
   {
     taskRequestId: "demand-factory-shift-command",
     providerId: "lingxi-factory-ai",
+    status: "accepted" as const,
     headline: "Shift command agent for live manufacturing exception triage",
     proposalSummary:
       "We would package a line-side command agent that summarizes interruptions, explains likely schedule impact, and gives shift leaders structured next steps before handover.",
@@ -70,6 +71,7 @@ const seededResponses = [
   {
     taskRequestId: "demand-factory-shift-command",
     providerId: "henry-first-party",
+    status: "shortlisted" as const,
     headline: "First-party planning + audit lane for manufacturing dispatch workflows",
     proposalSummary:
       "Our seeded first-party stack would approach this as a control and audit problem first, with explicit planning, review, and rollout guardrails before wider line adoption.",
@@ -81,6 +83,7 @@ const seededResponses = [
   {
     taskRequestId: "demand-quality-defect-review",
     providerId: "praxis-quality-lab",
+    status: "submitted" as const,
     headline: "Industrial quality triage agent with visual defect review framing",
     proposalSummary:
       "We would deliver a review-first quality agent that groups anomalies, drafts likely-cause notes, and accelerates the human escalation path for defect-heavy shifts.",
@@ -92,6 +95,7 @@ const seededResponses = [
   {
     taskRequestId: "demand-warehouse-wave-control",
     providerId: "relay-field-systems",
+    status: "shortlisted" as const,
     headline: "Warehouse wave and dispatch orchestration copilot",
     proposalSummary:
       "We would package an operations agent focused on wave spikes, slotting tension, and supervisor-visible dispatch recommendations during peak throughput windows.",
@@ -103,6 +107,7 @@ const seededResponses = [
   {
     taskRequestId: "demand-maintenance-copilot",
     providerId: "relay-field-systems",
+    status: "submitted" as const,
     headline: "Frontline maintenance copilot for knowledge retrieval and closure notes",
     proposalSummary:
       "We would deliver a field-ready maintenance assistant that retrieves procedures, structures diagnosis notes, and helps technicians produce cleaner work-order closure output.",
@@ -173,10 +178,10 @@ export async function syncSeededMarketplaceData() {
         providerId_taskRequestId: {
           providerId: response.providerId,
           taskRequestId: response.taskRequestId
-        }
-      },
-      update: {
-        status: "submitted",
+      }
+    },
+    update: {
+        status: response.status,
         headline: response.headline,
         proposalSummary: response.proposalSummary,
         deliveryApproach: response.deliveryApproach,
@@ -186,12 +191,58 @@ export async function syncSeededMarketplaceData() {
       create: {
         providerId: response.providerId,
         taskRequestId: response.taskRequestId,
-        status: "submitted",
+        status: response.status,
         headline: response.headline,
         proposalSummary: response.proposalSummary,
         deliveryApproach: response.deliveryApproach,
         etaLabel: response.etaLabel,
         confidence: response.confidence
+      }
+    });
+  }
+
+  await prisma.engagement.deleteMany({
+    where: {
+      demandResponse: {
+        taskRequestId: {
+          in: seededResponses.map((response) => response.taskRequestId)
+        }
+      }
+    }
+  });
+
+  for (const response of seededResponses.filter((item) => item.status === "accepted")) {
+    const existingResponse = await prisma.demandResponse.findUnique({
+      where: {
+        providerId_taskRequestId: {
+          providerId: response.providerId,
+          taskRequestId: response.taskRequestId
+        }
+      }
+    });
+
+    if (!existingResponse) {
+      continue;
+    }
+
+    await prisma.engagement.upsert({
+      where: {
+        taskRequestId: response.taskRequestId
+      },
+      update: {
+        providerId: response.providerId,
+        demandResponseId: existingResponse.id,
+        status: "kickoff",
+        title: response.headline,
+        summary: response.proposalSummary
+      },
+      create: {
+        taskRequestId: response.taskRequestId,
+        providerId: response.providerId,
+        demandResponseId: existingResponse.id,
+        status: "kickoff",
+        title: response.headline,
+        summary: response.proposalSummary
       }
     });
   }

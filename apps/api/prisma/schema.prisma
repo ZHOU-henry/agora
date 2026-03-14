@@ -19,8 +19,9 @@ model ProviderProfile {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  agents    AgentDefinition[]
-  responses DemandResponse[]
+  agents      AgentDefinition[]
+  responses   DemandResponse[]
+  engagements Engagement[]
 }
 
 model AgentDefinition {
@@ -57,8 +58,9 @@ model TaskRequest {
   agentId String
   agent   AgentDefinition @relation(fields: [agentId], references: [id], onDelete: Restrict)
 
-  runs      TaskRun[]
-  responses DemandResponse[]
+  runs       TaskRun[]
+  responses  DemandResponse[]
+  engagement Engagement?
 }
 
 model DemandResponse {
@@ -78,7 +80,27 @@ model DemandResponse {
   taskRequestId String
   taskRequest   TaskRequest @relation(fields: [taskRequestId], references: [id], onDelete: Cascade)
 
+  engagement Engagement?
+
   @@unique([providerId, taskRequestId])
+}
+
+model Engagement {
+  id               String   @id @default(cuid())
+  status           String
+  title            String
+  summary          String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  taskRequestId String @unique
+  taskRequest   TaskRequest @relation(fields: [taskRequestId], references: [id], onDelete: Cascade)
+
+  demandResponseId String @unique
+  demandResponse   DemandResponse @relation(fields: [demandResponseId], references: [id], onDelete: Cascade)
+
+  providerId String
+  provider   ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
 }
 
 model TaskRun {

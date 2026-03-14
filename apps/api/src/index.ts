@@ -11,6 +11,7 @@ import {
   listAgents,
   syncAgentDefinitions
 } from "./data/agents.js";
+import { getEngagementById, listEngagements } from "./data/engagements.js";
 import { syncSeededMarketplaceData } from "./data/marketplace-seeds.js";
 import {
   getProviderById,
@@ -74,6 +75,25 @@ server.get("/providers/:slug", async (request, reply) => {
 
   return {
     item: provider
+  };
+});
+
+server.get("/engagements", async () => {
+  return {
+    items: await listEngagements()
+  };
+});
+
+server.get("/engagements/:id", async (request, reply) => {
+  const { id } = request.params as { id: string };
+  const engagement = await getEngagementById(id);
+
+  if (!engagement) {
+    return notFound(reply, "Engagement not found");
+  }
+
+  return {
+    item: engagement
   };
 });
 

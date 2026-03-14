@@ -64,6 +64,14 @@ export const DemandResponseConfidenceSchema = z.enum([
   "low"
 ]);
 
+export const EngagementStatusSchema = z.enum([
+  "kickoff",
+  "scoping",
+  "building",
+  "review",
+  "delivered"
+]);
+
 export const TaskRequestInputSchema = z.object({
   agentId: z.string().min(1),
   title: z.string().min(3).max(120),
@@ -113,6 +121,20 @@ export const DemandResponseRecordSchema = DemandResponseInputSchema.extend({
 });
 
 export type DemandResponseRecord = z.infer<typeof DemandResponseRecordSchema>;
+
+export const EngagementRecordSchema = z.object({
+  id: z.string(),
+  taskRequestId: z.string(),
+  demandResponseId: z.string(),
+  provider: ProviderProfileSchema,
+  status: EngagementStatusSchema,
+  title: z.string(),
+  summary: z.string(),
+  createdAt: z.string(),
+  updatedAt: z.string()
+});
+
+export type EngagementRecord = z.infer<typeof EngagementRecordSchema>;
 
 export const TaskRunStatusSchema = z.enum([
   "submitted",
@@ -190,7 +212,8 @@ export type TaskRunRecord = z.infer<typeof TaskRunRecordSchema>;
 export const TaskRequestDetailSchema = TaskRequestRecordSchema.extend({
   agent: AgentDefinitionSchema,
   runs: z.array(TaskRunRecordSchema),
-  responses: z.array(DemandResponseRecordSchema)
+  responses: z.array(DemandResponseRecordSchema),
+  engagement: EngagementRecordSchema.nullable()
 });
 
 export type TaskRequestDetail = z.infer<typeof TaskRequestDetailSchema>;
@@ -240,6 +263,14 @@ export const ProviderProfileDetailSchema = ProviderProfileSchema.extend({
 
 export type ProviderProfileDetail = z.infer<typeof ProviderProfileDetailSchema>;
 
+export const EngagementDetailSchema = EngagementRecordSchema.extend({
+  taskRequest: TaskRequestRecordSchema,
+  agent: AgentDefinitionSchema,
+  demandResponse: DemandResponseRecordSchema
+});
+
+export type EngagementDetail = z.infer<typeof EngagementDetailSchema>;
+
 export const DemandBoardItemSchema = TaskRequestRecordSchema.extend({
   agent: AgentDefinitionSchema,
   responseCount: z.number(),
@@ -251,6 +282,7 @@ export type DemandBoardItem = z.infer<typeof DemandBoardItemSchema>;
 export const AgentDefinitionListSchema = z.array(AgentDefinitionSchema);
 export const ProviderProfileListSchema = z.array(ProviderProfileSchema);
 export const DemandBoardListSchema = z.array(DemandBoardItemSchema);
+export const EngagementListSchema = z.array(EngagementRecordSchema);
 export const TaskRequestDetailListSchema = z.array(TaskRequestDetailSchema);
 export const TaskRunSummaryListSchema = z.array(TaskRunSummarySchema);
 

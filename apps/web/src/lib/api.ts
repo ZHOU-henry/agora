@@ -3,6 +3,8 @@ import {
   AgentDefinitionListSchema,
   AgentDefinitionSchema,
   DemandBoardListSchema,
+  EngagementDetailSchema,
+  EngagementListSchema,
   findProviderBySlug,
   providerProfiles,
   ProviderProfileDetailSchema,
@@ -155,6 +157,32 @@ export async function getTaskRun(id: string) {
   }
 
   const parsed = TaskRunDetailSchema.safeParse(payload.item);
+  return parsed.success ? parsed.data : null;
+}
+
+export async function getEngagements() {
+  const payload = (await tryFetchJson("/engagements")) as
+    | { items?: unknown[] }
+    | null;
+
+  if (!payload?.items) {
+    return [];
+  }
+
+  const parsed = EngagementListSchema.safeParse(payload.items);
+  return parsed.success ? parsed.data : [];
+}
+
+export async function getEngagement(id: string) {
+  const payload = (await tryFetchJson(`/engagements/${id}`)) as
+    | { item?: unknown }
+    | null;
+
+  if (!payload?.item) {
+    return null;
+  }
+
+  const parsed = EngagementDetailSchema.safeParse(payload.item);
   return parsed.success ? parsed.data : null;
 }
 

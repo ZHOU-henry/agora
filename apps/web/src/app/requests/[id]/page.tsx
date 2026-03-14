@@ -34,7 +34,13 @@ export default async function TaskRequestPage({ params }: TaskRequestPageProps) 
     responses: taskRequest.responses.map((response) => ({
       ...response,
       provider: localizeProvider(response.provider, locale)
-    }))
+    })),
+    engagement: taskRequest.engagement
+      ? {
+          ...taskRequest.engagement,
+          provider: localizeProvider(taskRequest.engagement.provider, locale)
+        }
+      : null
   };
   return (
     <main className="page">
@@ -179,6 +185,35 @@ export default async function TaskRequestPage({ params }: TaskRequestPageProps) 
 
         <DemandResponseReview initialRequest={localizedRequest} locale={locale} />
       </div>
+
+      {localizedRequest.engagement ? (
+        <section className="panel">
+          <div className="sectionhead">
+            <p className="eyebrow">{locale === "zh" ? "正式承接" : "Engagement"}</p>
+            <h2>
+              {locale === "zh"
+                ? "这条需求已进入正式承接流程"
+                : "This demand has moved into a formal engagement"}
+            </h2>
+          </div>
+          <div className="timelineitem">
+            <div className="timelinehead">
+              <p className="tagline">{localizedRequest.engagement.provider.name}</p>
+              <span className={`statuspill ${toneClass(localizedRequest.engagement.status)}`}>
+                {humanizeToken(localizedRequest.engagement.status, locale)}
+              </span>
+            </div>
+            <p>{localizedRequest.engagement.title}</p>
+            <p>{localizedRequest.engagement.summary}</p>
+            <Link
+              href={`/engagements/${localizedRequest.engagement.id}`}
+              className="cardlink"
+            >
+              {locale === "zh" ? "查看承接详情" : "Open engagement"}
+            </Link>
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }

@@ -3,6 +3,8 @@ import type {
   AgentDefinition,
   DemandBoardItem,
   DemandResponseRecord,
+  EngagementDetail,
+  EngagementRecord,
   ProviderAgentReference,
   ProviderProfile,
   ProviderProfileDetail,
@@ -15,6 +17,7 @@ import type {
 type DbAgent = Prisma.AgentDefinitionGetPayload<Record<string, never>>;
 type DbProvider = Prisma.ProviderProfileGetPayload<Record<string, never>>;
 type DbDemandResponse = Prisma.DemandResponseGetPayload<Record<string, never>>;
+type DbEngagement = Prisma.EngagementGetPayload<Record<string, never>>;
 type DbTaskRequest = Prisma.TaskRequestGetPayload<Record<string, never>>;
 type DbTaskRun = Prisma.TaskRunGetPayload<Record<string, never>>;
 type DbRunEvent = Prisma.RunEventGetPayload<Record<string, never>>;
@@ -96,6 +99,22 @@ export function serializeProviderResponseReference(
   };
 }
 
+export function serializeEngagementRecord(
+  engagement: DbEngagement & { provider: DbProvider }
+): EngagementRecord {
+  return {
+    id: engagement.id,
+    taskRequestId: engagement.taskRequestId,
+    demandResponseId: engagement.demandResponseId,
+    provider: serializeProviderProfile(engagement.provider),
+    status: engagement.status as EngagementRecord["status"],
+    title: engagement.title,
+    summary: engagement.summary,
+    createdAt: engagement.createdAt.toISOString(),
+    updatedAt: engagement.updatedAt.toISOString()
+  };
+}
+
 export function serializeAgentDefinition(
   agent: DbAgent & { provider: DbProvider | null }
 ): AgentDefinition {
@@ -151,6 +170,7 @@ export function serializeTaskRequestDetail(taskRequest: DbTaskRequest & {
   agent: DbAgent & { provider: DbProvider | null };
   runs: DbTaskRun[];
   responses: Array<DbDemandResponse & { provider: DbProvider }>;
+  engagement: (DbEngagement & { provider: DbProvider }) | null;
 }): TaskRequestDetail {
   return {
     id: taskRequest.id,
@@ -165,7 +185,10 @@ export function serializeTaskRequestDetail(taskRequest: DbTaskRequest & {
     agentId: taskRequest.agentId,
     agent: serializeAgentDefinition(taskRequest.agent),
     runs: taskRequest.runs.map(serializeTaskRunRecord),
-    responses: taskRequest.responses.map(serializeDemandResponseRecord)
+    responses: taskRequest.responses.map(serializeDemandResponseRecord),
+    engagement: taskRequest.engagement
+      ? serializeEngagementRecord(taskRequest.engagement)
+      : null
   };
 }
 
@@ -239,6 +262,35 @@ export function serializeDemandBoardItem(
         .map((response) => response.updatedAt)
         .sort((a, b) => b.getTime() - a.getTime())[0]
         ?.toISOString() ?? null
+  };
+}
+
+export function serializeEngagementDetail(
+  engagement: DbEngagement & {
+    provider: DbProvider;
+    taskRequest: DbTaskRequest & {
+      agent: DbAgent & { provider: DbProvider | null };
+    };
+    demandResponse: DbDemandResponse & { provider: DbProvider };
+  }
+): EngagementDetail {
+  return {
+    ...serializeEngagementRecord(engagement),
+    taskRequest: {
+      id: engagement.taskRequest.id,
+      title: engagement.taskRequest.title,
+      description: engagement.taskRequest.description,
+      contextNote: engagement.taskRequest.contextNote ?? "",
+      requesterOrg: engagement.taskRequest.requesterOrg ?? "",
+      industry: engagement.taskRequest.industry ?? "",
+      status:
+        engagement.taskRequest.status as EngagementDetail["taskRequest"]["status"],
+      createdAt: engagement.taskRequest.createdAt.toISOString(),
+      updatedAt: engagement.taskRequest.updatedAt.toISOString(),
+      agentId: engagement.taskRequest.agentId
+    },
+    agent: serializeAgentDefinition(engagement.taskRequest.agent),
+    demandResponse: serializeDemandResponseRecord(engagement.demandResponse)
   };
 }
 
